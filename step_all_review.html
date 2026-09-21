@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pointcept 全程复习 · Step 0→5</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --panel: #161a21;
+    --panel2: #1c212b;
+    --border: #2a3140;
+    --text: #d7dce4;
+    --muted: #8a93a3;
+    --accent: #4f9cf9;
+    --accent2: #37c9a3;
+    --warn: #f0b429;
+    --danger: #f97066;
+    --purple: #b58cf9;
+    --code-bg: #10131a;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { font-size: 20px; font-weight: 600; }
+  h1 small { color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 10px; }
+  .spacer { flex: 1; }
+  button.btn {
+    background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 14px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+  button.btn:hover { border-color: var(--accent); color: var(--accent); }
+  button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.btn.primary:hover { filter: brightness(1.1); color: #fff; }
+
+  .overall { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 18px; margin-bottom: 18px; }
+  .overall .row { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; flex-wrap: wrap; }
+  .overall .row:last-child { margin-bottom: 0; }
+  .overall .stat { font-size: 13px; color: var(--muted); }
+  .overall .stat b { color: var(--text); font-size: 15px; }
+  .overall .stat b.good { color: var(--accent2); }
+  .overall .stat b.bad { color: var(--danger); }
+  .bar { flex: 1; min-width: 200px; height: 10px; background: var(--code-bg); border-radius: 5px; overflow: hidden; }
+  .bar > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width .4s; }
+
+  nav.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  nav.tabs button {
+    background: var(--panel); border: 1px solid var(--border); color: var(--muted);
+    padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; font-family: inherit;
+  }
+  nav.tabs button.active { border-color: var(--accent); color: var(--accent); background: rgba(79,156,249,.08); }
+  nav.tabs button .cnt { font-size: 11px; margin-left: 6px; color: var(--muted); }
+
+  .group-intro { background: var(--panel); border-left: 3px solid var(--accent); border-radius: 6px; padding: 12px 16px; margin-bottom: 18px; font-size: 14px; color: var(--muted); }
+  .group-intro b { color: var(--text); }
+
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px; overflow: hidden; }
+  .card.done { border-color: rgba(55,201,163,.45); }
+  .card.wrong { border-color: rgba(249,112,102,.45); }
+  .card-head { display: flex; align-items: center; gap: 10px; padding: 13px 18px; cursor: pointer; user-select: none; }
+  .card-head .qno { font-size: 12px; color: var(--muted); background: var(--code-bg); padding: 2px 8px; border-radius: 4px; white-space: nowrap; font-family: Consolas, monospace; }
+  .card-head .qtitle { font-weight: 600; flex: 1; }
+  .chev { color: var(--muted); font-size: 12px; transition: transform .2s; }
+  .card.open .chev { transform: rotate(90deg); }
+  .card.flash { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,156,249,.25); }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+  .badge.todo { background: rgba(140,147,163,.15); color: var(--muted); }
+  .badge.seen { background: rgba(240,180,41,.15); color: var(--warn); }
+  .badge.ok { background: rgba(55,201,163,.15); color: var(--accent2); }
+  .badge.bad { background: rgba(249,112,102,.15); color: var(--danger); }
+
+  .tchip { font-size: 11px; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+  .tchip.mc   { background: rgba(79,156,249,.15); color: var(--accent); }
+  .tchip.tf   { background: rgba(181,140,249,.15); color: var(--purple); }
+  .tchip.qa   { background: rgba(55,201,163,.15); color: var(--accent2); }
+  .tchip.code { background: rgba(240,180,41,.15); color: var(--warn); }
+
+  .card-body { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); }
+  .card.open .card-body { display: block; }
+
+  .prompt { margin: 14px 0; }
+  pre.code {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12.5px;
+    overflow-x: auto; line-height: 1.55; color: #a9d1ff; margin: 8px 0;
+  }
+  .hint { color: var(--muted); font-size: 13px; margin: 6px 0; }
+  .hint b { color: var(--warn); }
+
+  .mode-tabs { display: flex; gap: 0; margin: 12px 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; width: fit-content; }
+  .mode-tabs button { background: transparent; border: none; color: var(--muted); padding: 7px 18px; cursor: pointer; font-size: 13px; font-family: inherit; }
+  .mode-tabs button.active { background: var(--accent); color: #fff; }
+
+  .opts { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+  .opt {
+    display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px;
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; font-size: 14px; transition: border-color .15s;
+  }
+  .opt:hover { border-color: var(--accent); }
+  .opt.picked { border-color: var(--accent); background: rgba(79,156,249,.08); }
+  .opt.right { border-color: var(--accent2); background: rgba(55,201,163,.08); }
+  .opt.wrongpick { border-color: var(--danger); background: rgba(249,112,102,.08); }
+  .opt.locked { cursor: default; }
+  .opt .tag {
+    font-family: Consolas, monospace; font-size: 12px; color: var(--muted);
+    background: var(--panel2); border-radius: 4px; padding: 1px 7px; margin-top: 2px; flex-shrink: 0;
+  }
+  .opt.right .tag { color: var(--accent2); }
+  .opt.wrongpick .tag { color: var(--danger); }
+
+  .tfbtns { display: flex; gap: 12px; margin: 12px 0; }
+  .tfbtns .opt { flex: 1; justify-content: center; align-items: center; padding: 12px; font-weight: 600; }
+
+  .scoreline { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
+
+  .verdict { margin-top: 12px; padding: 12px 16px; border-radius: 8px; font-size: 14px; }
+  .verdict.pass { background: rgba(55,201,163,.08); border: 1px solid rgba(55,201,163,.4); }
+  .verdict.fail { background: rgba(249,112,102,.08); border: 1px solid rgba(249,112,102,.4); }
+  .verdict b.pass-t { color: var(--accent2); }
+  .verdict b.fail-t { color: var(--danger); }
+  .verdict .exp { margin-top: 8px; border-top: 1px dashed var(--border); padding-top: 8px; color: var(--text); }
+  .verdict .exp code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 12.5px; color: #a9d1ff; font-family: Consolas, monospace; }
+  .verdict .exp pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 12px; font-family: Consolas, monospace; font-size: 12px; overflow-x: auto; margin: 6px 0;
+    color: #a9d1ff; line-height: 1.5;
+  }
+
+  textarea.answer {
+    width: 100%; min-height: 110px; background: var(--code-bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 12px;
+    font-family: inherit; font-size: 14px; line-height: 1.6; resize: vertical;
+  }
+  textarea.answer:focus { outline: none; border-color: var(--accent); }
+  textarea.answer.mono { font-family: Consolas, "Cascadia Mono", monospace; font-size: 13px; }
+  textarea.answer.tall { min-height: 160px; }
+
+  .ref { margin-top: 14px; border: 1px dashed var(--border); border-radius: 8px; padding: 14px 16px; background: rgba(79,156,249,.03); }
+  .ref h4 { font-size: 13px; color: var(--accent); margin-bottom: 8px; }
+  .ref .body { font-size: 14px; }
+  .ref .body p { margin-bottom: 8px; }
+  .ref .body code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 12.5px; color: #a9d1ff; font-family: Consolas, monospace; }
+  .ref .body pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 12px; font-family: Consolas, monospace; font-size: 12px; overflow-x: auto; margin: 6px 0;
+    color: #a9d1ff; line-height: 1.5;
+  }
+
+  .points { margin-top: 12px; }
+  .points h4 { font-size: 13px; color: var(--warn); margin-bottom: 6px; }
+  .points label { display: flex; gap: 10px; align-items: flex-start; padding: 7px 10px; border-radius: 6px; cursor: pointer; font-size: 13.5px; }
+  .points label:hover { background: rgba(255,255,255,.03); }
+  .points input[type=checkbox] { accent-color: var(--accent2); margin-top: 4px; }
+  .points .hit { color: var(--accent2); }
+  .points .miss { color: var(--muted); }
+
+  .score-big { font-size: 22px; font-weight: 700; color: var(--accent2); }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+  @media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
+  .compare .col h5 { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .compare .col .txt { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 13px; white-space: pre-wrap; max-height: 300px; overflow-y: auto; }
+
+  .kmap { margin-top: 10px; border: 1px dashed rgba(181,140,249,.4); border-radius: 8px; padding: 10px 14px; background: rgba(181,140,249,.04); }
+  .kmap h4 { font-size: 12.5px; color: var(--purple); margin-bottom: 6px; }
+  .kmap .krow { display: flex; gap: 10px; font-size: 13px; margin-bottom: 4px; align-items: baseline; }
+  .kmap .krow .k { color: var(--muted); flex-shrink: 0; width: 76px; }
+  .kmap code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 12px; color: #a9d1ff; font-family: Consolas, monospace; }
+
+  .chip {
+    display: inline-block; font-family: Consolas, monospace; font-size: 11.5px;
+    padding: 1px 9px; border-radius: 10px; cursor: pointer; margin: 1px 2px 1px 0;
+    background: var(--code-bg); border: 1px solid var(--border); color: var(--muted);
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.c-ok   { border-color: rgba(55,201,163,.5);  color: var(--accent2); background: rgba(55,201,163,.08); }
+  .chip.c-bad  { border-color: rgba(249,112,102,.5); color: var(--danger);  background: rgba(249,112,102,.08); }
+  .chip.c-seen { border-color: rgba(240,180,41,.5);  color: var(--warn);    background: rgba(240,180,41,.08); }
+  .chip.c-mid  { border-color: rgba(181,140,249,.5); color: var(--purple);  background: rgba(181,140,249,.08); }
+
+  .flow h3.sec { color: var(--accent); font-size: 15px; margin: 22px 0 10px; }
+  .flow h3.sec.test { color: var(--purple); }
+  .flow .stage { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 14px; }
+  .flow .flowwrap.test .stage { border-left-color: var(--purple); }
+  .flow .stage .t { font-weight: 600; font-size: 14px; }
+  .flow .stage .f { font-family: Consolas, monospace; font-size: 11.5px; color: var(--muted); font-weight: 400; margin-left: 8px; }
+  .flow .stage .d { font-size: 13px; color: var(--muted); margin: 2px 0 4px; }
+  .flow .stage .qs { margin-top: 2px; }
+  .flow .arrow { text-align: center; color: var(--muted); font-size: 13px; margin: 4px 0; }
+
+  .lesson { background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--accent2); border-radius: var(--radius); margin-bottom: 18px; }
+  .lesson-head { display: flex; align-items: center; gap: 10px; padding: 13px 18px; cursor: pointer; user-select: none; }
+  .lesson-head .lt { font-weight: 600; flex: 1; color: var(--accent2); font-size: 15px; }
+  .lesson.open .chev { transform: rotate(90deg); }
+  .lesson-body { display: none; padding: 2px 20px 16px; border-top: 1px solid var(--border); }
+  .lesson.open .lesson-body { display: block; }
+  .lesson h4 { color: var(--accent); font-size: 14px; margin: 16px 0 8px; }
+  .lesson p { margin-bottom: 8px; font-size: 14px; }
+  .lesson pre.code { margin: 8px 0 12px; }
+  .lesson code { background: var(--code-bg); padding: 1px 6px; border-radius: 4px; font-size: 12.5px; color: #a9d1ff; font-family: Consolas, monospace; }
+  .lesson table { border-collapse: collapse; width: 100%; margin: 10px 0 14px; font-size: 13px; }
+  .lesson th, .lesson td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
+  .lesson th { color: var(--muted); font-weight: 600; background: var(--code-bg); white-space: nowrap; }
+  .lesson .note { background: rgba(240,180,41,.06); border: 1px dashed rgba(240,180,41,.4); border-radius: 8px; padding: 10px 14px; margin: 10px 0; font-size: 13.5px; }
+  .lesson .exam { background: rgba(181,140,249,.06); border: 1px dashed rgba(181,140,249,.45); border-radius: 8px; padding: 10px 14px; margin: 14px 0 4px; font-size: 13.5px; line-height: 1.9; }
+  .lesson .exam h5 { color: var(--purple); font-size: 13px; margin-bottom: 4px; }
+
+  /* ── 💬 问答窗口（讲解/题目下方的 Claude 答疑） ── */
+  .chatbox { margin-top: 14px; border: 1px dashed rgba(79,156,249,.45); border-radius: 8px; background: rgba(79,156,249,.03); }
+  .chatbox-head { display: flex; align-items: center; gap: 8px; padding: 9px 14px; cursor: pointer; user-select: none; font-size: 13px; color: var(--accent); }
+  .chatbox-head .chev { color: var(--muted); font-size: 12px; transition: transform .2s; }
+  .chatbox.open .chev { transform: rotate(90deg); }
+  .chatbox-head .sub { color: var(--muted); font-size: 12px; flex: 1; }
+  .chatbox-body { display: none; padding: 4px 14px 14px; border-top: 1px solid var(--border); }
+  .chatbox.open .chatbox-body { display: block; }
+  .chat-msgs { max-height: 420px; overflow-y: auto; margin: 10px 0; display: flex; flex-direction: column; gap: 10px; }
+  .cmsg { border-radius: 8px; padding: 9px 13px; font-size: 13.5px; line-height: 1.75; }
+  .cmsg.user { background: rgba(79,156,249,.08); border: 1px solid rgba(79,156,249,.3); align-self: flex-end; max-width: 88%; white-space: pre-wrap; }
+  .cmsg.bot { background: var(--code-bg); border: 1px solid var(--border); align-self: stretch; }
+  .cmsg.bot .who { font-size: 11px; color: var(--accent2); margin-bottom: 4px; font-family: Consolas, monospace; }
+  .cmsg.err { background: rgba(249,112,102,.07); border: 1px solid rgba(249,112,102,.35); color: var(--danger); font-size: 13px; }
+  .cmsg.bot p { margin-bottom: 7px; }
+  .cmsg.bot p:last-child { margin-bottom: 0; }
+  .cmsg.bot ul, .cmsg.bot ol { margin: 4px 0 8px 20px; }
+  .cmsg.bot li { margin-bottom: 3px; }
+  .cmsg.bot code { background: var(--panel2); padding: 1px 6px; border-radius: 4px; font-size: 12px; color: #a9d1ff; font-family: Consolas, monospace; }
+  .cmsg.bot pre { background: var(--panel2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: Consolas, "Cascadia Mono", monospace; font-size: 12px; overflow-x: auto; margin: 6px 0; color: #a9d1ff; line-height: 1.5; }
+  .cmsg.bot pre code { background: none; padding: 0; color: inherit; }
+  .cmsg.bot h4 { color: var(--accent); font-size: 13.5px; margin: 8px 0 4px; }
+  .cmsg.bot strong { color: var(--text); }
+  .chatbar { display: flex; gap: 8px; }
+  .chatbar textarea {
+    flex: 1; min-height: 44px; max-height: 160px; background: var(--code-bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px;
+    font-family: inherit; font-size: 13.5px; line-height: 1.55; resize: none;
+  }
+  .chatbar textarea:focus { outline: none; border-color: var(--accent); }
+  .chatbar button.send {
+    background: var(--accent); border: none; color: #fff; border-radius: 8px;
+    padding: 0 18px; cursor: pointer; font-size: 13px; font-family: inherit; white-space: nowrap;
+  }
+  .chatbar button.send:hover { filter: brightness(1.1); }
+  .chatbar button.send:disabled { opacity: .45; cursor: default; }
+  .chat-empty-hint { color: var(--muted); font-size: 12.5px; padding: 2px 2px 0; }
+  .chat-wait { align-self: stretch; background: var(--code-bg); border: 1px dashed var(--border); border-radius: 8px; padding: 9px 13px; font-size: 13px; color: var(--muted); }
+  .chat-wait .dots::after { content: ""; animation: chatdots 1.2s steps(4) infinite; }
+  @keyframes chatdots { 0% { content: ""; } 25% { content: "·"; } 50% { content: "··"; } 75% { content: "···"; } }
+
+  footer { margin-top: 30px; color: var(--muted); font-size: 12px; text-align: center; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--panel2); border: 1px solid var(--accent); color: var(--text); padding: 10px 20px; border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 99; }
+  .toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Pointcept 全程复习 · Step 0→5<small>知识点讲解 → 仓库代码 → 考察题目 · 9 章 · 先读讲解再做题</small></h1>
+    <div class="spacer"></div>
+    <button class="btn" onclick="exportRecord()">导出学习记录</button>
+    <button class="btn" onclick="resetAll()" style="color:var(--danger)">清空重置</button>
+  </header>
+
+  <div class="overall">
+    <div class="row">
+      <div class="stat">总进度 <b id="ov-done">0</b>/<b id="ov-total">0</b></div>
+      <div class="bar"><div id="ov-bar" style="width:0%"></div></div>
+      <div class="stat">已看答案 <b id="ov-seen">0</b> 题</div>
+    </div>
+    <div class="row">
+      <div class="stat">客观题（单选/判断/代码）<b id="ov-obj">–</b></div>
+      <div class="stat">问答要点命中 <b id="ov-qa">–</b></div>
+    </div>
+  </div>
+
+  <nav class="tabs" id="tabs"></nav>
+  <div id="content"></div>
+
+  <footer>数据保存在浏览器 localStorage（key: step_all_review_v1）· 与 step5_practice.html 的进度互不影响 · 做完点「导出学习记录」贴给 Claude 对答案 · 💬 提问窗口需 review_server.py（见窗口内提示）</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   全程复习题库：9 章（Step 0→5 学过的一切），每章 = 讲解 + 代码例子 + 题目
+   mc 单选 / tf 判断（自动判分）· qa 问答（要点自评）· code 代码（输出比对）
+   ══════════════════════════════════════════════════════════════ */
+const GROUPS = [
+{
+  id: "overview", name: "🗺 全程地图", desc: "",
+  questions: []
+},
+{
+  id: "s1", name: "S1 · 点云初见", desc: "<b>Step 0/1</b>：环境工具链 + 第一次亲手摸点云。本章回答：点云是什么数据、和图像差在哪、领域第一问题是什么。",
+  lesson: {
+    title: "📖 讲解 · 点云是什么，领域第一问题是什么",
+    html: `
+<h4>知识点总结</h4>
+<p><b>LiDAR 是极坐标传感器</b>：绕 z 轴 360° 旋转打线，每条线一个仰角。角度分辨率固定、距离越远弧长越大 → 点分布<b>不均匀</b>。一帧 SemanticKITTI 约 <b>12 万个点</b>（64 线）。</p>
+<p><b>内存表示</b>：一帧点云就是一个 <code>[N,3]</code> 数组（每点 xyz）；LiDAR 额外带反射强度，磁盘上每点是 <code>[N,4]</code>（x,y,z,strength）。和图像的本质区别：点云<b>无序、无网格拓扑、点数逐帧变化</b>——没有 index buffer，不能像图像那样直接滑窗卷积。<b>这就是整个领域的出发点。</b></p>
+<p><b>语义分割任务</b>：给每个点预测一个类别标签 → 输出 <code>segment[N]</code>（SemanticKITTI 19 类）。可视化上"练习按高度假着色 → 训练好的模型按语义类别着色"。</p>
+<h4>仓库代码例子 1 · step1_touch_pointcloud.py（模拟一帧扫描）</h4>
+<pre class="code">rng = np.random.default_rng(42)            # 种子：同种子必产同序列（可复现）
+n = 120000                                  # 一帧 SemanticKITTI 约 12 万点
+angles = rng.uniform(0, 2 * np.pi, n)      # 水平角 [0, 2π)
+r = np.sqrt(rng.uniform(0, 1, n)) * 35.0   # 距离 0~35m
+z = rng.uniform(-2.0, 3.0, n)              # 高度展开
+
+x = r * np.cos(angles)
+y = r * np.sin(angles)
+coord = np.stack([x, y, z], axis=1)        # [N, 3] —— 点云的全部"几何"
+
+pcd = o3d.geometry.PointCloud()
+pcd.points = o3d.utility.Vector3dVector(coord)   # numpy 数组喂给 open3d
+o3d.visualization.draw_geometries([pcd])         # 弹出可旋转 3D 窗口</pre>
+<p>圆盘采样几何：<code>angles</code> 均匀 + <code>r = sqrt(u)</code> 组合 → 点在圆盘上<b>按面积均匀分布</b>（r 的密度 ∝ r，恰好抵消圆环面积 2πr·dr 的增长）；若 <code>r</code> 直接 uniform，径向密度恒定 → 点向圆心堆积（近密远疏，恰是真实 LiDAR 的物理特征）。第二段对比实验 <code>rng.normal(0, [1.0, 1.0, 0.4], (3000, 3))</code> 造了一辆"车"：3000 点的椭球状点团，物体级密度感受。</p>
+<h4>仓库代码例子 2 · pointcept/datasets/semantic_kitti.py（真身入口）</h4>
+<p>真实数据不是模拟的：<code>SemanticKITTIDataset.get_data</code> 用 <code>np.fromfile(..., dtype=np.float32).reshape(-1, 4)</code> 读 <code>.bin</code> → [N,4]（x,y,z,strength），再读成对的 <code>.label</code>（uint32 → <code>segment[N]</code>），统一打包成标准字典交给 transform 管道（→ 第 3 章数据链路）。</p>
+<h4>环境事实（Step 0 的边界条件）</h4>
+<p>本机 RTX 500 Ada <b>4GB</b>（只够推理验证，训练等服务器）；无 conda/WSL/Docker/nvcc；脚本统一 <code>python -X utf8</code> 跑（Windows 控制台 GBK 中文乱码坑）；工具链 <code>pip install numpy open3d addict pyyaml</code>，前期实验不依赖 torch。</p>
+<div class="exam"><h5>🎯 下面 5 道题考什么</h5>
+s1q1 考 [N,3] 表示与图像的三点区别（无序/无拓扑/点数不定）· s1q2 考 sqrt 采样的几何含义 · s1q3 考 .bin 的 [N,4] 与 strength 的去向（连到 in_channels=4）· s1q4 考 np.stack axis 的形状推导 · s1q5 考"无拓扑为什么是大问题"+领域三大应对</div>`
+  },
+  questions: [
+    {
+      id: "s1q1", type: "mc",
+      kmap: { stage: "S1 · 点云初见（Step 1）", where: "step1_touch_pointcloud.py:23（coord = np.stack(...)）", what: "点云的内存表示：无序点集，没有网格邻接", link: "正因为无拓扑，才有 GridSample 体素化（s2q）与 kNN 邻域（s5q）两条应对路线" },
+      title: "点云的内存表示 vs 图像",
+      prompt: "一帧点云在内存里是 <code>coord [N,3]</code> 数组。它和图像 <code>[H,W,3]</code> 最本质的区别是什么？",
+      options: [
+        "点云是稀疏张量，天然适合卷积",
+        "点云无序、无网格拓扑、点数逐帧变化——没有现成的\"邻接结构\"给卷积用",
+        "点云是 [N,3] 但内部暗含三角网格连接（类似 index buffer）",
+        "没本质区别，只是维度不同"
+      ],
+      correct: 1,
+      explain: `<p>图像是<b>规则网格</b>：像素天然有上下左右邻居，卷积核直接滑窗。点云是<b>无序点集</b>：同一坨点任意打乱顺序几何完全不变、点与点之间没有存储任何连接关系、每帧点数还不一样。没有现成邻接结构 → 整个领域都要先"造邻接"（体素化或 kNN）再上网络。</p>`
+    },
+    {
+      id: "s1q2", type: "mc",
+      kmap: { stage: "S1 · 点云初见（Step 1）", where: "step1_touch_pointcloud.py:18（r = np.sqrt(...) * 35.0）", what: "sqrt 把 r 的密度修正为 ∝ r，抵消圆环面积增长 → 圆盘面积均匀", link: "真实 LiDAR 不做修正：角度分辨率固定 → 天然近密远疏；这个非均匀性是 GridSample（s2）面对的数据前提" },
+      title: "r = sqrt(uniform) 的几何含义",
+      prompt: "step1 里距离采样写成 <code>r = np.sqrt(rng.uniform(0, 1, n)) * 35.0</code>。这行 sqrt 的几何作用是什么？",
+      options: [
+        "模拟激光多回波",
+        "数值稳定，防止浮点下溢",
+        "让 r 的分布密度 ∝ r，抵消外圈圆环面积更大 → 点在圆盘上按面积均匀；若 r 直接 uniform，点会向圆心堆积",
+        "让距离更均匀地落在 0~35m"
+      ],
+      correct: 2,
+      explain: `<p>直接 uniform 采 r：单位半径区间点数一样，但外圈圆环面积大（2πr·dr）→ 面积密度 ∝ 1/r → <b>向圆心堆积</b>。取 sqrt 后 r² 均匀 → 面积均匀。注意方向：这是<b>合成数据的均匀化</b>；真实 LiDAR 角度分辨率固定、不做修正，<b>天然近密远疏</b>——两种分布是反着来的。</p>`
+    },
+    {
+      id: "s1q3", type: "tf", answer: true,
+      kmap: { stage: "S1 · 点云初见（Step 1/2）", where: "datasets/semantic_kitti.py get_data（.bin reshape(-1,4)）", what: "磁盘格式 [N,4] = x,y,z,strength；strength 进 feat 决定 in_channels=4", link: "feat_keys 拼 coord+strength → model in_channels=4（s3q2、s9q3 同一条链）" },
+      title: "LiDAR 的第 4 维：strength",
+      prompt: "判断：「SemanticKITTI 的 .bin 文件里每点是 [x, y, z, strength] 四个 float32；strength 是激光反射强度，训练时和 xyz 拼在一起作为网络输入特征，所以 semantic_kitti config 的 in_channels 是 4。」",
+      explain: `<p>对。<code>np.fromfile(...).reshape(-1, 4)</code> → 每点 4 列；config 里 <code>feat_keys = ["coord", "strength"]</code>（3+1=4 列拼成 feat）→ <code>in_channels=4</code>。图像模型的 in_channels=3（RGB），点云模型这里是 4（xyz + 强度）——同一个概念。</p>`
+    },
+    {
+      id: "s1q4", type: "mc",
+      kmap: { stage: "S1 · 点云初见（Step 1）", where: "step1_touch_pointcloud.py:23", what: "np.stack(list, axis=1) 把一列 [N] 数组沿新轴 1 堆叠成 [N,3]", link: "切片 coord[:, 0] 取回一列 = stride 视图（API 速查 §一.6）；Collect 拼 feat 也是沿最后一维（s3q2）" },
+      title: "np.stack 的形状推导",
+      prompt: "<code>x, y, z</code> 都是长度 120000 的一维数组，<code>np.stack([x, y, z], axis=1)</code> 的输出形状是？",
+      options: ["(3, 120000)", "(120000,)", "(120000, 3)", "报错"],
+      correct: 2,
+      explain: `<p>stack 把 3 个 [120000] 沿<b>新插入的轴 1</b> 堆起来 → (120000, 3)：每行一个点。若 axis=0 则得 (3, 120000)。这是点云代码出现频率最高的"组包"操作——和顶点 buffer 里"每 3 个 float 一个顶点"的 stride 布局是同一件事。</p>`
+    },
+    {
+      id: "s1q5", type: "qa",
+      kmap: { stage: "S1 → 全领域的动机", where: "领域层面（transform.py 的 GridSample / pointops 的 knn_query 都是回答）", what: "无拓扑 → 必须先造邻接", link: "两条路线：体素化（s2 GridSample）、kNN 邻域（s5 PTv2）" },
+      title: "没有 index buffer 为什么是大问题？",
+      prompt: "图像有规则网格，卷积直接滑窗。请用自己的话说清：①点云\"没有邻接结构\"具体指什么；②点云深度学习领域的<b>三大应对路线</b>（至少说出两条）。",
+      points: [
+        "点与点之间没有存储任何连接/邻接关系，打乱顺序几何不变，\"邻居\"无法直接查",
+        "点数逐帧变化、分布不均匀（近密远疏），没有固定分辨率",
+        "路线①：体素化——投进规则网格再用 3D 卷积（GridSample/稀疏卷积）",
+        "路线②：kNN / ball query 造局部邻域，在邻域内做 attention（PTv2 路线）",
+        "路线③：逐点 MLP + 池化（PointNet 系），或点云 Transformer 直接在点上算"
+      ],
+      ref: `<p><b>①指什么</b>：数组里只有一串坐标，没有任何"谁和谁相邻"的信息；把 12 万点随机重排，表示的是同一坨几何——网络 therefore 不能像卷积那样"按位置找邻居"。</p>
+<p><b>②三大应对</b>：a) <b>体素化</b>：把点投进规则 3D 网格（GridSample/稀疏卷积，MinkowskiEngine/PTv3 路线）；b) <b>kNN/ball query 邻域</b>：给每个点查 16 个最近邻，在邻域内做 attention（PTv2 路线，本仓库在用）；c) <b>逐点 MLP+池化</b>：PointNet 系用对称函数解决无序。三条路线本质都是"先造邻接/先造结构，再套深度学习积木"。</p>`
+    }
+  ]
+},
+{
+  id: "s2", name: "S2 · GridSample", desc: "<b>Step 2 主实验</b>：亲手实现体素化降采样。本章是全仓库数据侧的核心算子，也是你第一个\"读懂了还能写出来\"的算法。",
+  lesson: {
+    title: "📖 讲解 · GridSample：体素化 + 空间哈希 + 每格选代表",
+    html: `
+<h4>知识点总结 · 五步算法</h4>
+<p>12 万点直接进网络算不动（第 5 章算 N² 的账），必须先降点数。<b>GridSample = 把空间切成边长 grid_size 的立方体，每个格子里随机保留 1 个代表点</b>。核心五步：</p>
+<p>① <b>floor 量化</b>：世界坐标 ÷ gs 后向负无穷取整 → 整数格坐标（格子身份）；② <b>空间哈希</b>：三维格坐标压成一个一维整数键；③ <b>argsort</b>：按键排序 → 同格点相邻；④ <b>cumsum 前缀和</b>：算出每组在排序数组里的起点；⑤ <b>组内随机偏移</b>：每格随机选 1 个代表点（训练模式 = 数据扰动，顺带当增强）。</p>
+<h4>仓库代码例子 · step2_gridsample.py 实验三（复刻 transform.py:877-887 训练模式核心）</h4>
+<pre class="code">gs = 0.05
+grid3 = np.floor(coord_surface / gs).astype(np.int64)   # ① 量化
+min3 = grid3.min(axis=0)
+grid3_shifted = grid3 - min3                # 仓库同款: grid_coord -= min_coord（防大坐标撑爆哈希键）
+
+key3 = grid3_shifted[:,0]*10**10 + grid3_shifted[:,1]*10**5 + grid3_shifted[:,2]   # ② 空间哈希
+idx_sort = np.argsort(key3)                 # ③ 排序 → 同格点相邻
+key_sort = key3[idx_sort]                   #    （argsort+花式索引=排序，gather 又出现了）
+_, inverse, count = np.unique(key_sort, return_inverse=True, return_counts=True)
+idx_select = (np.cumsum(np.insert(count, 0, 0)[0:-1])         # ④ 每组起点（前缀和）
+              + np.random.randint(0, count.max(), count.size) % count)  # ⑤ 组内随机偏移
+idx_unique = idx_sort[idx_select]           #    花式索引取出每格代表点</pre>
+<table>
+<tr><th>代码片段</th><th>要点</th></tr>
+<tr><td><code>np.floor</code> 不用 round</td><td>格子以左下角为锚点对齐，"格坐标 = 格子身份"一一对应；round 的 0.5 边界归属有歧义。负数注意：floor 往负无穷取（-3.2 → -4.0）</td></tr>
+<tr><td><code>x*10**10 + y*10**5 + z</code></td><td>把三维格坐标按 <b>10⁵ 进制</b>拼成一个整数（每维占 5 位十进制）——和 RGB24 打包 <code>(r&lt;&lt;16)|(g&lt;&lt;8)|b</code> 同构；前提每维格坐标 &lt; 10⁵，所以先 <code>-= min</code></td></tr>
+<tr><td><code>np.insert(count,0,0).cumsum()[:-1]</code></td><td>前缀和（GPU 经典并行算法）变出"每组的起始下标"；<code>[:-1]</code> 切掉末尾的总点数</td></tr>
+<tr><td><code>randint(0, count.max()) % count</code></td><td>0~max-1 的随机数对各组 count <b>取模折回</b>组内范围 → 每格内均匀随机选一个</td></tr>
+<tr><td><code>return_inverse=True</code></td><td>额外拿到"每个原始点 → 属于哪个唯一格"的映射——测试期把预测铺回全量点就靠它（s9 的 test 链）</td></tr>
+</table>
+<h4>三个实验（证伪 → 真相 → 真功夫）</h4>
+<table>
+<tr><th>实验</th><th>设置</th><th>结果 / 结论</th></tr>
+<tr><td>一（对照组）</td><td>体积内随机撒 12 万点</td><td>gs=0.05 只压到 ~119959（≈1.0x）——点太稀，格总是"一格一点"。<b>证伪</b>"随便的点云也能压"</td></tr>
+<tr><td>二（真相）</td><td>表面采样：地面 8 万 + 墙 3 万 + 车 1 万</td><td>压缩 1.1x~5.4x——真实点云全贴在 2D 表面（2D 流形嵌在 3D 格子里），同一表面被多线多帧反复扫到</td></tr>
+<tr><td>三（真功夫）</td><td>复刻仓库训练模式</td><td>每格随机代表点 = 有损压缩 + 数据扰动；可视化确认轮廓结构完好</td></tr>
+</table>
+<div class="note">认知定位：GridSample 是<b>剪枝（有损）</b>，不是 memoization（无损缓存）——图形学同构：LOD 网格简化、BVH 构建、SSAO 的降采样，全是"剪掉冗余换计算量"。PTv2 的 grid_sizes=(0.06,0.12,0.24,0.48) 四级下采样 = 逐级 LOD（mipmap 同构）。</div>
+<div class="exam"><h5>🎯 下面 6 道题考什么</h5>
+s2q1 考哈希键的进制打包 / s2q2 考 argsort 的"下标表"语义（代码题）· s2q3 考 insert+cumsum 求起点（代码题）· s2q4 考 randint%count 的取模折回 / s2q5 考三实验各自的结论 / s2q6 考 floor 的锚点对齐</div>`
+  },
+  questions: [
+    {
+      id: "s2q1", type: "mc",
+      kmap: { stage: "S2 · GridSample 第②步", where: "step2_gridsample.py:36 / transform.py:877 附近", what: "三维格坐标 → 一维整数键的进制打包", link: "先 grid -= min 保证各维不超 10⁵（s2 实验三第 2 行）；工业真身用 fnv 哈希防溢出" },
+      title: "空间哈希键的打包原理",
+      prompt: "<code>key = grid[:,0]*10**10 + grid[:,1]*10**5 + grid[:,2]</code> 这个键的编码原理是什么？",
+      options: [
+        "把三个坐标值求和压缩",
+        "随机哈希，碰撞了也无所谓",
+        "按 10⁵ 进制拼接：x 占最高 5 位、y 占中间 5 位、z 占最低 5 位——类似 RGB24 打包 (r<<16)|(g<<8)|b",
+        "把坐标归一化到 0~1"
+      ],
+      correct: 2,
+      explain: `<p>这是<b>位置进制打包</b>：只要每维格坐标 &lt; 10⁵（即 0.05m 格子下场景范围 &lt; 5km），三个数就互不进位、可逆解码。和图形学里把 RGB8 三个通道塞进一个 uint32 完全同构。所以前面必须 <code>grid -= min</code> 把坐标平移到非负且不太大——超出位数就会"串维"碰撞（真身 transform.py 用 fnv 哈希彻底防溢出）。</p>`
+    },
+    {
+      id: "s2q2", type: "code", kind: "predict",
+      code: 'import numpy as np\nkey = np.array([5, 3, 5, 3, 9])\nprint(np.argsort(key, kind="stable"))',
+      expected: "1 3 0 2 4",
+      kmap: { stage: "S2 · GridSample 第③步", where: "step2_gridsample.py:105（idx_sort = np.argsort(key3)）", what: "argsort 返回\"排序后各位置放的是原数组谁\"的下标表", link: "argsort + 花式索引 = 排序本身（gather）；SphereCrop 选最近 k 点同款（s9 transform 链）" },
+      title: "代码题 · argsort 的下标表",
+      prompt: "不运行代码，先写出 <code>print</code> 的输出（写下标序列），再运行验证。",
+      explain: `<p>argsort 语义 = <b>"谁排第几"</b>：返回的下标表 idx 满足 key[idx] 是升序。排序后应为 [3,3,5,5,9]：第一个 3 是原下标 1、第二个 3 是 3（stable 稳定排序保持原顺序）、5→0、5→2、9→4，所以输出 <code>[1 3 0 2 4]</code>。验证：<code>key[np.argsort(key, kind="stable")]</code> → [3 3 5 5 9]——argsort + 花式索引（gather）合体就是排序。</p>`
+    },
+    {
+      id: "s2q3", type: "code", kind: "predict",
+      code: 'import numpy as np\ncount = np.array([2, 0, 3, 1])\nprint(np.insert(count, 0, 0).cumsum()[:-1])',
+      expected: "0 2 2 5",
+      kmap: { stage: "S2 · GridSample 第④步", where: "step2_gridsample.py:108（idx_select 的 cumsum 部分）", what: "前缀和变出每组起始下标：insert 补 0 → cumsum → 掐尾", link: "offset 的生成同款（每样本点数 → 前缀和 → batch 边界，s3 Collect）；GPU 上 prefix sum 是经典并行算法" },
+      title: "代码题 · 前缀和求组起点",
+      prompt: "不运行代码，先写出 <code>print</code> 的输出，再运行验证。（这行是 GridSample 定位\"每组从哪开始\"的真身逻辑）",
+      explain: `<p><code>np.insert(count, 0, 0)</code> → <code>[0, 2, 0, 3, 1]</code>；<code>.cumsum()</code> → <code>[0, 2, 2, 5, 6]</code>；<code>[:-1]</code> 掐掉末尾的总数 → <code>[0 2 2 5]</code>。读法：第 1 组从 0 开始（2 个点占 0~1），第 2 组从 2 开始，第 3 组还是 2（因为第 2 组 count=0），第 4 组从 5 开始。实际 unique 出来的 count 不会是 0，这里纯练 API 链。</p>`
+    },
+    {
+      id: "s2q4", type: "mc",
+      kmap: { stage: "S2 · GridSample 第⑤步", where: "step2_gridsample.py:109（np.random.randint(...) % count）", what: "组内随机偏移：大范围随机数取模折回各组范围", link: "训练模式的\"随机\"就是数据扰动/增强（s2 实验三结论）；对比 test 模式每格取第一个点（确定性，s9 test 链）" },
+      title: "randint % count 的取模折回",
+      prompt: "<code>np.random.randint(0, count.max(), count.size) % count</code>（count = 每格点数数组）在干嘛？",
+      options: [
+        "统计每组点数的余数分布",
+        "打乱 count 的顺序",
+        "给每组生成一个组内随机偏移：0~max-1 的随机数对各组 count 取模，越界部分折回组内 → 每格均匀随机选一个代表点",
+        "计算每组的中位数下标"
+      ],
+      correct: 2,
+      explain: `<p>randint 先生成统一范围 [0, count.max()) 的随机数；对第 i 组取模 count[i]，等于把 [0, max) 折叠映射到 [0, count[i])——偏移落在组内且均匀。加到 cumsum 起点上（<code>idx_select = 起点 + 偏移</code>），再用 <code>idx_sort[idx_select]</code> 花式索引取出代表点。训练模式的这个\"随机\"是有意为之的数据扰动。</p>`
+    },
+    {
+      id: "s2q5", type: "qa",
+      kmap: { stage: "S2 · 三个实验", where: "step2_gridsample.py 实验一/二/三", what: "压缩的物理来源 = 表面采样，不是点数本身", link: "多帧堆叠是第二个压缩来源（10 帧叠加同一表面被反复扫到）；LOD/BVH = 剪枝同构（s6 的 LOD 视角）" },
+      title: "三个实验各证明了什么？",
+      prompt: "step2 脚本设计了三个实验（随机撒点 / 表面采样 / 复刻训练模式）。请分别说清：每个实验的设置、结果、以及它<b>证明或证伪</b>了什么。",
+      points: [
+        "实验一（对照）：体积内随机 12 万点，gs=0.05 只压到 ~12 万（≈1.0x）→ 证伪\"任意点云都能压缩\"",
+        "实验二（真相）：地面+墙+车的表面采样 12 万点，压 1.1~5.4x → 压缩来自\"点贴在 2D 表面上\"",
+        "物理原因：2D 表面嵌在 3D 格子里，同一片表面被相邻扫描线/相邻帧反复扫到，点挤在同一格",
+        "实验三：复刻训练模式——每格随机选 1 个代表点 = 有损压缩 + 数据扰动（当增强用）",
+        "认知定位：GridSample 是剪枝（有损），不是缓存（无损）；图形学同构 = LOD/网格简化"
+      ],
+      ref: `<p><b>实验一</b>：70m×70m 体积里随机撒点，点距远大于格子，几乎每格最多一个点 → 压不动（12万→~119959）。它<b>证伪</b>了"GridSample 对任意点云都有效"。</p>
+<p><b>实验二</b>：地面 8 万 + 墙 3 万 + 车表面 1 万——真实世界的点全贴在表面上（2D 流形嵌在 3D 里），同一表面被多线多帧反复扫到，点挤在同一格 → 压缩 1.1x~5.4x。它揭示了压缩的<b>物理来源</b>。</p>
+<p><b>实验三</b>：完整复刻 <code>transform.py:877-887</code> 训练模式五步链，验证每格随机代表点：可视化确认点变稀但地面/墙/车<b>轮廓结构完好</b>——用 1/1~1/5 的点保住几何，换可控计算量；"随机"本身是数据扰动（增强）。</p>`
+    },
+    {
+      id: "s2q6", type: "tf", answer: true,
+      kmap: { stage: "S2 · GridSample 第①步", where: "step2_gridsample.py:99（np.floor(coord_surface / gs)）", what: "floor 量化：格子以左下角锚定，格坐标 = 格子身份", link: "np.floor 负数往负无穷取（API 速查 §一.2）；格坐标之后还喂给模型当 token 位置（grid_coord）" },
+      title: "floor 而不是 round",
+      prompt: "判断：「GridSample 量化用 <code>np.floor(coord / gs)</code> 而不是 <code>np.round</code>，是为了让格子以左下角为锚点对齐，保证\"整数格坐标 ↔ 格子\"一一对应。」",
+      explain: `<p>对。floor 让所有格子按统一锚点（左下角）切分，同一个格子里所有点的 floor 结果必然相同——<b>格坐标就是格子的身份证</b>。round 的 0.5 边界归属有歧义，相邻点可能被分进同一格或不同格，破坏身份唯一性。量化结果 grid_coord 还有第二个用途：直接作为模型的 token 位置信息（PTv2 的 relative position encoding 吃的就是它）。</p>`
+    }
+  ]
+},
+{
+  id: "s3", name: "S3 · 数据链路", desc: "<b>Step 2 补充A</b>：dataset 类和 transform 管道两层分工——读懂任何 Pointcept 数据代码的钥匙。",
+  lesson: {
+    title: "📖 讲解 · 数据链路两层：翻译官 + 中间件",
+    html: `
+<h4>知识点总结</h4>
+<p>任何数据进网络前都走同一条两层链路：</p>
+<p><b>上层：dataset 类 = 格式翻译官。</b>不管什么数据集（SemanticKITTI 的 .bin/.label、nuScenes 的 db、Waymo 的 tfrecord），读出来都统一成<b>标准字典</b>：<code>coord [N,3]</code>、<code>strength [N,1]</code>、<code>color [N,3]</code>、<code>segment [N]</code>。它的职责到"翻译"为止——<b>不做任何增强</b>。</p>
+<p><b>下层：transform 管道 = 中间件链。</b>config 里的 <code>transform=[...]</code> 列表按<b>顺序</b>执行，每个 transform 吃字典吐字典：几何增强只动 <code>coord</code>，但会同步更新受影响的字段（如 GridSample 选取后 segment 也要跟着选）。<b>顺序就是数据流</b>，换序就是另一个管道。</p>
+<p><b>出口：Collect</b>（transform.py:54）——决定什么进网络：按 <code>feat_keys</code> 把字段拼成 <code>feat</code>（决定 model 的 in_channels），并生成 <code>offset</code>（batch 内各样本点数的 cumsum，点云靠它分 batch——因为没有能 reshape 的固定 N）。</p>
+<h4>仓库代码例子 · semantic_kitti config 的管道（config:99-123 训练链）</h4>
+<pre class="code">dict(type="RandomRotate", angle=[-1, 1], p=0.5),        # 几何增强：±180°，一半概率应用
+dict(type="RandomScale", scale=[0.9, 1.1]),              # 尺度扰动
+dict(type="RandomFlip", p=0.5),                          # x/y 两轴各自独立抛硬币翻转
+dict(type="RandomJitter", sigma=0.005, clip=0.02),       # 高斯抖动，clip 防离群
+dict(type="GridSample", grid_size=0.05, hash_type="fnv", # 体素化降采样（S2 全章）
+     mode="train", return_grid_coord=True),
+dict(type="PointClip", point_cloud_range=(-35.2, -35.2, -4, 35.2, 35.2, 1.6)),
+dict(type="SphereCrop", point_max=80000, mode="random"), # 裁到最多 8 万点
+dict(type="SphereCrop", point_max=120000, mode="center"),# 再以中心最近裁到 12 万
+dict(type="ToTensor"),                                   # numpy → torch
+dict(type="Collect", keys=["coord","grid_coord","index"],# 出口：组包 + offset
+     feat_keys=["coord", "strength"])</pre>
+<p>读法：前 4 个是<b>几何增强</b>（全量点上做）→ GridSample 降采样 → Clip/Crop 控范围控点数 → ToTensor/Collect 组包。<code>feat_keys=["coord","strength"]</code> 拼出 [N,4] → 这就是 in_channels=4 的由 来。</p>
+<div class="note">前端类比：dataset = 资源解码器（glb/bin 各种格式 → 统一顶点结构）；transform 管道 = 渲染管线串联的 pass / Express 中间件（req 进 res 出，顺序敏感）。两层正交：新数据集只需写一个翻译官类，全部 transform 复用；新增强只需写一个 transform，全部数据集复用。</div>
+<div class="exam"><h5>🎯 下面 4 道题考什么</h5>
+s3q1 考两层各自的职责边界 / s3q2 考 Collect 的 feat_keys → in_channels 链路 / s3q3 考管道顺序敏感性 / s3q4 考接入新数据集要写什么</div>`
+  },
+  questions: [
+    {
+      id: "s3q1", type: "mc",
+      kmap: { stage: "S3 · 数据链路两层", where: "datasets/defaults.py（get()：get_data → transform 管道）", what: "dataset 只翻译格式，transform 管道负责增强与采样", link: "标准字典字段 coord/strength/color/segment（s1q3）；offset 在 Collect 生成（s3q2）" },
+      title: "两层各自的职责",
+      prompt: "关于 Pointcept 数据链路的分工，正确的是：",
+      options: [
+        "dataset 类负责数据增强，transform 负责读文件",
+        "dataset 类把任意格式翻译成标准字典（coord/strength/color/segment），transform 管道按顺序做增强与采样——前者不做增强，后者不碰文件",
+        "两者都可以做增强，config 里随便放",
+        "dataset 类直接输出模型输入张量"
+      ],
+      correct: 1,
+      explain: `<p>职责正交：dataset = <b>翻译官</b>（任意格式 → 标准字典，到翻译为止）；transform = <b>中间件</b>（吃字典吐字典、按序执行）。这样新数据集只写一个类就能复用全部增强，新增强写一个 transform 就能服务全部数据集。</p>`
+    },
+    {
+      id: "s3q2", type: "mc",
+      kmap: { stage: "S3 · Collect（管道出口）", where: "transform.py:54（Collect：feat_keys 拼 feat、生成 offset）", what: "feat_keys 决定输入特征列数 → model in_channels", link: "in_channels=4 的来源链（s1q3）；offset=cumsum 分 batch（B6/B 侧）" },
+      title: "feat_keys 与 in_channels 的链路",
+      prompt: "config 里 <code>Collect(feat_keys=[&quot;coord&quot;, &quot;strength&quot;])</code>，那么 model 的 <code>in_channels</code> 必须是多少？这个链路怎么走？",
+      options: [
+        "3——只算 coord",
+        "4——Collect 把 coord(3列)+strength(1列) 沿最后一维拼成 feat [N,4]，模型第一层吃 4 通道",
+        "1——strength 单独走一路",
+        "无所谓，模型自动推断"
+      ],
+      correct: 1,
+      explain: `<p>Collect 在管道末端把 feat_keys 列出的字段沿最后一维 cat 成 feat：coord 是 [N,3]、strength 是 [N,1] → feat [N,4]。模型 patch_embed 第一层的 <code>in_channels=4</code> 必须对上，差一列直接 shape 报错。图像模型 in_channels=3（RGB）是同一个概念。Collect 同时生成 offset（各样本点数前缀和），点云 batch 全靠它。</p>`
+    },
+    {
+      id: "s3q3", type: "tf", answer: false,
+      kmap: { stage: "S3 · transform 管道", where: "config:99-123（训练链的顺序设计）", what: "顺序即数据流：增强在 GridSample 前做、以全量点为基准", link: "test 链顺序反着来：PointClip 在最前（s9q4）；调序 = 换管道 = 换语义" },
+      title: "transform 的顺序敏感性",
+      prompt: "判断：「transform 列表是集合，顺序无所谓，反正每个都会执行。」",
+      explain: `<p>错。管道是<b>有序中间件链</b>：先 RandomRotate 再 GridSample，是在全量点上旋转后降采样；反过来就是先采样再旋转——扰动效果完全不同。再如训练链 SphereCrop(80000) 在 SphereCrop(120000) 前面是两级递进裁剪，交换就没意义。顺序就是数据流，读懂一条链要按行号从头读到尾。</p>`
+    },
+    {
+      id: "s3q4", type: "qa",
+      kmap: { stage: "S3 · 两层正交（工程价值）", where: "datasets/ 下每个数据集一个类 + transform.py 全复用", what: "接入新数据的成本被翻译官层收拢", link: "领导任务的数据源问题（nuScenes/SemanticKITTI/Waymo/自有数据）——决定写哪个 dataset 类" },
+      title: "接入一个新数据集要写什么？",
+      prompt: "假设公司自有 LiDAR 数据要接入 Pointcept 训练（标注格式和 SemanticKITTI 不同）。按两层链路的设计，你<b>最少</b>要写什么、什么可以直接复用？",
+      points: [
+        "只写一个 dataset 类（继承默认基类）：读自有格式 → 翻译成标准字典 coord/strength/segment",
+        "transform 管道全部复用（增强/GridSample/Collect 与数据集无关）",
+        "若特征通道不同（比如无 strength 或多一维），改 Collect 的 feat_keys 并同步 model 的 in_channels",
+        "写完在 config 的 type 字段换成新类名，Registry 自动装配",
+        "不需要碰模型和训练循环代码"
+      ],
+      ref: `<p>答案就是"翻译官模式"的全部价值：<b>新数据 = 新翻译官类</b>（get_item 里做格式转换，产出标准字典），<b>其余全复用</b>。特征不同改 <code>feat_keys</code> + <code>in_channels</code> 一对参数。这就是挂在"要问领导数据源是哪个"后面的工程事实：数据源决定写哪个 dataset 类，其余链路不动。</p>`
+    }
+  ]
+},
+{
+  id: "s4", name: "S4 · 网络与训练", desc: "<b>Step 2 补充B</b>：神经网络 = 权重 + 固定流程；训练 = 反向传播找权重。五步心跳是后面一切训练代码的骨架。",
+  lesson: {
+    title: "📖 讲解 · 神经网络、反向传播、五步心跳",
+    html: `
+<h4>知识点总结</h4>
+<p><b>神经网络 = 权重（可学参数）+ 固定流程（结构）</b>。forward 是你写的固定数据流（积木组装，→ 第 6 章）；权重是流程里的可变常数。训练 = 用反向传播自动调整权重，让 loss 下降。</p>
+<p><b>反向传播 = 在计算图上沿链式法则反向走一遍</b>：前向时框架记账（每个算子记下输入和运算），loss 出发反向走图，每一步用链式法则把梯度从下游传到上游，直到每个权重拿到自己的梯度。它是<b>通用算法</b>——不管你的 forward 是 ResNet 还是 PTv2，同一套引擎处理。</p>
+<h4>仓库代码例子 · 训练循环五步心跳（train.py:69-90 的骨架）</h4>
+<pre class="code">for epoch in range(max_epoch):
+    for data in train_loader:
+        optimizer.zero_grad()        # ⑤ 清梯度（放最前，PyTorch 梯度默认累加）
+        output_dict = model(data)    # ① 前向：数据流过固定流程 → 预测
+        loss = output_dict["loss"]   # ② 损失：criteria 在 model 内部已算好
+        loss.backward()              # ③ 反向：计算图上链式法则 → 每个权重的梯度
+        optimizer.step()             # ④ 更新：权重 -= lr × 梯度（下山一步）</pre>
+<table>
+<tr><th>步骤</th><th>在干嘛</th><th>图形学类比</th></tr>
+<tr><td>① forward</td><td>数据流过你写的固定流程</td><td>draw call 序列（结构=管线，权重=uniform 变量的值）</td></tr>
+<tr><td>② loss</td><td>预测 vs 答案的差距（CE 交叉熵等）</td><td>误差度量函数</td></tr>
+<tr><td>③ backward</td><td>链式法则沿计算图反向，算每个权重的梯度</td><td>——（没有对应物，深度学习独有神器）</td></tr>
+<tr><td>④ step</td><td>权重 -= lr·梯度（沿梯度反方向下山）</td><td>——（相当于"自动调参"）</td></tr>
+<tr><td>⑤ zero_grad</td><td>清掉上轮梯度（框架默认累加）</td><td>——</td></tr>
+</table>
+<p>语义分割的输出形态：模型给每个点吐 19 类的 logits <code>[N,19]</code>，CE 拿 logits 和 segment 算损失（→ 第 9 章讲 CE+Lovasz 双损失）。Transformer block 的标准组装：LayerNorm → Attention → +残差 → LayerNorm → MLP → +残差（两段"归一化→变换→残差"，第 6 章逐块拆）。</p>
+<div class="note">概念分界：你<b>永远只写 forward</b>（组装积木）；backward 是自动微分引擎替你生成的（第 7 章讲它怎么做到）。"会设计 forward + 懂梯度往哪流" = 算法工程师的全部深度学习底层要求。</div>
+<div class="exam"><h5>🎯 下面 5 道题考什么</h5>
+s4q1 考五步心跳的顺序与漏步后果 / s4q2 考 backward 谁写的 / s4q3 考用自己的话讲反向传播 / s4q4 考权重 vs 超参的分界 / s4q5 考 attention 与 MLP 的分工</div>`
+  },
+  questions: [
+    {
+      id: "s4q1", type: "mc",
+      kmap: { stage: "S4 · 五步心跳", where: "engines/train.py:69-90（真主循环）", what: "zero_grad 的位置与梯度累加语义", link: "梯度累积是『漏掉 zero_grad』的反向利用：凑满 N 步才 step（s8 工程加固）" },
+      title: "五步心跳 · 漏一步会怎样",
+      prompt: "训练循环五步中，哪一步漏掉会导致<b>梯度跨 step 累积</b>、训练方向越来越歪？",
+      options: ["loss.backward()", "optimizer.step()", "optimizer.zero_grad()", "model(data)"],
+      correct: 2,
+      explain: `<p>PyTorch 的梯度是<b>累加</b>语义（.grad +=），不清零就把上一轮的梯度混进来。真身 train.py 还把这个"特性"反向利用成<b>梯度累积</b>：小显存时故意累积 N 步 loss÷N 再统一 step，等效大 batch——概念骨架没变，只是 zero_grad 变成"每组首步才清"。</p>`
+    },
+    {
+      id: "s4q2", type: "tf", answer: false,
+      kmap: { stage: "S4 · 执行机制分界", where: "torch autograd 引擎（C++/CUDA 实现）", what: "backward 由自动微分引擎沿计算图生成，工程师只写 forward", link: "第 7 章展开：记账 → 反向走图 → 链式连乘" },
+      title: "backward 是谁写的？",
+      prompt: "判断：「loss.backward() 里的求导代码是算法工程师针对自己的模型手写好的，backward 只是调用入口。」",
+      explain: `<p>错。backward 是<b>自动微分引擎</b>（C++/CUDA 实现）在运行时沿你 forward 记下的计算图自动生成并执行的——你写 forward 就等于定义了 backward。这正是深度学习框架的核心价值：换网络结构不用重推导数。你要懂的是<b>梯度往哪流、会不会断</b>（第 6 章残差/激活的数学），不是手写导数。</p>`
+    },
+    {
+      id: "s4q3", type: "qa",
+      kmap: { stage: "S4 · 反向传播", where: "概念层（对应 train.py loss.backward() 那一行内部）", what: "记账 + 反向走图 + 链式连乘", link: "验证实验 y=x³ backward → 12（s7q2）；残差的 ∂H/∂x = 1 + ∂F/∂x（s6q1）" },
+      title: "用自己的话讲反向传播",
+      prompt: "不查资料，用自己的话把反向传播讲一遍（对象：懂 JS 但没碰过 DL 的前端同事）。",
+      points: [
+        "前向时框架记账：把 forward 走过的每个运算记成一张计算图（节点=算子，边=数据）",
+        "loss 出发，沿图反向走，上游节点的梯度 = 下游梯度 × 本地导数（链式法则）",
+        "走到每个权重处，它就拿到自己的梯度（当前 loss 对它的敏感度）",
+        "optimizer 沿梯度反方向更新：权重 -= lr × 梯度",
+        "全程自动化——这是框架的核心价值，工程师只写 forward"
+      ],
+      ref: `<p>三步讲法：<b>① 记账</b>——前向时框架把 <code>y = x³</code> 这样的每步运算记成计算图；<b>② 反向走图</b>——从 loss 出发逆着数据流走，每个节点只算自己的"本地导数"；<b>③ 链式连乘</b>——本地导数与下游传来的梯度相乘继续上传，到达每个权重时它就有了完整梯度。数值验证（第 7 章会亲手跑）：x=2 时 <code>y=x³.backward()</code> → x.grad = 3x² = 12。</p>`
+    },
+    {
+      id: "s4q4", type: "mc",
+      kmap: { stage: "S4 · 权重 vs 超参", where: "config 全部手定字段 vs model 内部 nn.Parameter", what: "训练学的 = 权重；人定的 = 超参", link: "grid_size/lr/enc_depths 全是超参（s9）；Wq/Wk/Wv 是权重（s5q1）" },
+      title: "权重与超参的分界",
+      prompt: "下列哪些量是<b>训练学出来的</b>（而非人手定的）？",
+      options: [
+        "learning rate 和 weight decay",
+        "grid_size 和 point_max",
+        "attention 里的 Wq、Wk、Wv 投影矩阵",
+        "enc_channels=(96,192,384,512)"
+      ],
+      correct: 2,
+      explain: `<p>Wq/Wk/Wv 是 <code>nn.Linear</code> 里的权重矩阵（nn.Parameter），由反向传播更新——这就是"训练一个模型"的实际含义：只改这些数。lr、grid_size、通道数、深度全是<b>超参</b>，config 里手定、训练中不变。分清这两类，读 config 时就知道哪些是"结构决定"哪些是"训练决定"。</p>`
+    },
+    {
+      id: "s4q5", type: "mc",
+      kmap: { stage: "S4 · Transformer 组装", where: "point_transformer_v2m2_base.py:132（Block = norm→attn→残差→norm→MLP→残差）", what: "attention 管 token 间通信，MLP 管 token 内变换", link: "第 6 章六积木展开；这句话是 Transformer 论文系列的通用骨架" },
+      title: "attention 与 MLP 的分工",
+      prompt: "Transformer block 里 attention 层和 MLP 层的经典分工是什么？",
+      options: [
+        "attention 做 token 内的特征变换，MLP 做 token 间通信",
+        "attention 负责 token 之间的信息交换（动态加权邻居），MLP 负责每个 token 内部的特征变换（逐点非线性投影）",
+        "两者都做 token 间通信，只是并行",
+        "MLP 负责下采样，attention 负责上采样"
+      ],
+      correct: 1,
+      explain: `<p>一句话记忆：<b>attention 是"开会"（token 间交换信息），MLP 是"回去消化"（token 内做变换）</b>。attention 的权重是输入的函数（动态路由，第 6 章积木⑥）；MLP 对每个 token 独立做同一套投影。PTv2 的 Block 原样继承这个分工——只是"token"换成了体素代表点、"邻居"换成了 16 个最近邻。</p>`
+    }
+  ]
+},
+{
+  id: "s5", name: "S5 · Attention 落地", desc: "<b>Step 2 补充C + Step 3</b>：QKV 四纠正、N² 的账、PTv2 三改动、Grouped attention 真代码。从\"懂原理\"到\"能在仓库里指认\"。",
+  lesson: {
+    title: "📖 讲解 · QKV 纠正、N² 动机、PTv2 三改动、Grouped 落地",
+    html: `
+<h4>知识点总结 1 · QKV 四纠正（先纠错再上代码）</h4>
+<table>
+<tr><th>常见错误图景</th><th>正确图景</th></tr>
+<tr><td>点积直接算出输出</td><td>点积只是<b>打分</b>（相似度），分数还要过 softmax 才是权重</td></tr>
+<tr><td>V 是"权重"</td><td>Q/K/V 是<b>同一输入 x 的三份并列投影</b>（三个矩阵 Wq/Wk/Wv）；V 是<b>货物</b>，Q/K 只管<b>配重</b></td></tr>
+<tr><td>softmax 压缩信息、可有可无</td><td>softmax 把分数归一化成和为 1 的分布，并<b>放大差距</b>（大分更高、小分更低）</td></tr>
+<tr><td>输出=得分最高的那个 V</td><td>输出是<b>全部 V 的加权和</b>（一个都没丢，只是占比不同）</td></tr>
+</table>
+<h4>知识点总结 2 · N² 的账（一切架构改动的动机）</h4>
+<p>朴素 attention：每个 token 对所有 token 打分 → N×N 矩阵。12 万点 N²=144 亿——按 FP32 存一张这样的分数矩阵约 <b>500GB</b> 显存，直接爆炸。所以点云 Transformer 的全部设计都围绕"如何在 N 大的情况下不付 N²"。</p>
+<h4>知识点总结 3 · PTv2 三个改动（对应三处代码）</h4>
+<table>
+<tr><th>改动</th><th>做法</th><th>动机</th></tr>
+<tr><td>① 体素 = token</td><td>GridSample 后每个体素的代表点当一个 token（12万 → ~8万 → 四级下采样）</td><td>token 数可控，N 从 12 万压到几千</td></tr>
+<tr><td>② 16-NN 邻域</td><td>每个 token 只和 16 个最近邻算 attention（N×K，K=16）</td><td>N² → N×K，这张表从 144 亿 → 几百万项</td></tr>
+<tr><td>③ 相对位置编码</td><td>分数里加入 token 对之间的相对坐标（用 GridSample 的 grid_coord）</td><td>attention 本身是"内容寻址"，没有位置概念；点云的几何关系必须显式喂进去</td></tr>
+</table>
+<h4>知识点总结 4 · 深度换广度（U-Net 金字塔）</h4>
+<p>PTv2 是 4 级 U-Net：<code>grid_sizes=(0.15, 0.375, 0.9375, 2.34375)</code> 格子越来越大 → token 越来越少；<code>enc_channels=(96,192,384,512)</code> 通道越来越宽。每上一级 token 数 ÷16（3D 格子边长×2.5 → 数量 ×15.6）、通道 ×2 —— <b>16^L：用深度（级数）换广度（感受野）</b>，第 4 级时 token 只有几百个，它们之间做"准全局" attention 也不再贵。图形学同构：mipmap / LOD 金字塔。</p>
+<h4>仓库代码例子 · GroupedVectorAttention（point_transformer_v2m2_base.py:48-129）</h4>
+<pre class="code">class GroupedVectorAttention(nn.Module):
+    def __init__(...):
+        self.linear_q = Linear(in_channels, channels)     # 三份并列投影
+        self.linear_k = Linear(in_channels, channels)
+        self.linear_v = Linear(in_channels, channels)
+        self.weight_groups = nn.Parameter(...)            # 分组权重（groups=2）
+
+    def forward(self, feats):
+        q, k, v = self.linear_q(feats), self.linear_k(feats), self.linear_v(feats)  # :107
+        q, v = self.qkv_map(q, v)                          # 邻域展开：N → N×16
+        position_emb = self.pos_enc(...)                   # 相对位置编码
+        v = v + position_emb                               # 货物上贴上位置标签
+        sim = batched_einsum("n i s, p n i s -> p n s", q, k)   # :120 QK 点积打分
+        sim = sim + pos_mat                                # 分数里加位置项
+        sim = softmax(sim, dim=-1)                         # :122 归一化 + 放大差距
+        attn = weighted_sum("p n s, p n s g -> p n g", sim, v)  # :127 权重混合货物</pre>
+<table>
+<tr><th>片段</th><th>对应纠正</th></tr>
+<tr><td><code>linear_q/k/v</code> 三份并列 Linear</td><td>纠正②：Q/K/V 同源并列投影，不是三个串行阶段</td></tr>
+<tr><td><code>softmax(sim, dim=-1)</code>（:122）</td><td>纠正①③：分数→权重，必经 softmax</td></tr>
+<tr><td>einsum（:120/:127）</td><td>读法："把指定维度求和消掉，其余保留"——i 维消掉=打分，s 维消掉=加权求和</td></tr>
+<tr><td><code>mask</code> 参与打分</td><td>padding 邻居（不足 16 个的点）分数置 -inf，softmax 后权重≈0</td></tr>
+</table>
+<div class="note">剪枝 vs 缓存：GridSample 扔点 = <b>剪枝（有损）</b>；把重复计算结果存表复用 = <b>缓存（无损）</b>。图形学同构：SSAO 的降采样、稀疏矩阵只存非零元、BVH 加速求交、mipmap——都是"砍掉不重要的换速度"，没有一个是"无损缓存"。深度学习的下采样同属剪枝家族。</div>
+<div class="exam"><h5>🎯 下面 6 道题考什么</h5>
+s5q1 考 QKV 的同源并列 / s5q2 考 N² 的账（500GB）· s5q3 考 PTv2 三改动逐条 / s5q4 考 softmax 的位置（代码题）/ s5q5 考 16^L 深度换广度 / s5q6 考剪枝 vs 缓存的分界</div>`
+  },
+  questions: [
+    {
+      id: "s5q1", type: "mc",
+      kmap: { stage: "S5 · QKV 纠正②", where: "point_transformer_v2m2_base.py:107（q,k,v = self.linear_q/k/v(feats)）", what: "Q/K/V 是同一输入的三份并列投影，V 是货物", link: "三个 Linear 的权重矩阵 = 训练要学的对象（s4q4）；attention 动态权重 vs conv 固定权重（s6q5）" },
+      title: "QKV 到底是什么关系",
+      prompt: "关于 Q、K、V 的来源与角色，正确的是：",
+      options: [
+        "Q 是输入，K、V 是上一层的输出",
+        "Q/K/V 串行流水：先 Q，Q 变 K，K 再变 V",
+        "V 是权重矩阵，Q、K 是输入特征",
+        "Q/K/V 是同一个输入 x 经三个并列投影矩阵（Wq/Wk/Wv）得到的：Q/K 配重打分，V 装货物"
+      ],
+      correct: 3,
+      explain: `<p>代码即证据：<code>q, k, v = self.linear_q(feats), self.linear_k(feats), self.linear_v(feats)</code>——同一个 feats 过三条并列 Linear。角色：Q/K 只参与算分（配重），<b>V 才是被搬运的信息（货物）</b>，输出 = softmax(QKᵀ)·V = 权重混合全部 V。三个投影矩阵都是训练要学的参数。</p>`
+    },
+    {
+      id: "s5q2", type: "mc",
+      kmap: { stage: "S5 · N² 动机", where: "原理层（PTv2 三改动的总动机）", what: "朴素 attention 的 N×N 分数矩阵在大 N 下不可行", link: "体素=token（s5q3）、16-NN 邻域（同上）是两记解法；GridSample 压点数是前置条件（S2）" },
+      title: "12 万点的 N² 是什么概念",
+      prompt: "对 12 万点直接做朴素 attention，N×N 打分矩阵意味着什么？",
+      options: [
+        "约 12 万个分数，1.2GB 显存，没问题",
+        "约 144 亿个分数——FP32 存约 500GB，单卡完全放不下",
+        "计算量是 N²，但显存只是 O(N)，没压力",
+        "只有推理时有问题，训练没事"
+      ],
+      correct: 1,
+      explain: `<p>N=12万 → N²=1.44×10¹⁰ = 144 亿项；FP32 每项 4 字节 → ~57.6GB（若含中间梯度更多）——单卡 4GB 放任何一张分数矩阵都放不下。所以"能不能上网络"的前提是先把 N 打下来：体素化（token）+ 邻域 attention（N×K）。这也是为什么 GridSample 是数据侧第一站。</p>`
+    },
+    {
+      id: "s5q3", type: "qa",
+      kmap: { stage: "S5 · PTv2 三改动", where: "GridSample（transform.py:840）/ grouped 提邻域（:67-96）/ pos_enc（:98-106）", what: "token 化、N×K 邻域、相对位置编码——三招合击 N²", link: "D1/D2/D3 三差异（Step 3 验证单）；grid_coord 二次利用（s2q6）" },
+      title: "PTv2 的三个改动",
+      prompt: "相比朴素 Transformer，PTv2 为把 attention 用到点云上做了哪三个关键改动？各自解决什么问题？（用自己的话，可对照代码位置）",
+      points: [
+        "① 体素 = token：GridSample 后每格代表点当一个 token，N 从 12 万压到可控规模",
+        "② 16-NN 邻域 attention：每个 token 只跟 16 个最近邻算分数，N² → N×K",
+        "③ 相对位置编码：把 token 对的相对坐标加进打分——attention 本身没有位置概念，几何关系必须显式喂",
+        "动机统一指向：12 万点朴素 attention 的 N² 不可行",
+        "顺带说出 Grouped attention（通道分组降低 QK 计算量）加分"
+      ],
+      ref: `<p><b>①体素=token</b>：GridSample 压点 + grid_coord 当 token 身份 → 计算单元从\"点\"变\"格子\"（D1）。<b>②16-NN 邻域</b>：kNN 查询给每个 token 找 16 个邻居，分数表从 N² 降到 N×16（D2）。<b>③相对位置编码</b>：QK 点积是内容相似度，纯 attention 无位置概念；把相邻 token 的相对位移（从 grid_coord 算）编码进分数（D3）。三招合击 N²：先压 N（①），再把每行只算 K 项（②），并让分数带几何语义（③）。</p>`
+    },
+    {
+      id: "s5q4", type: "code", kind: "predict",
+      code: 'import numpy as np\n\ndef softmax(x):\n    e = np.exp(x - x.max())\n    return e / e.sum()\n\nprint(softmax(np.array([2.0, 1.0, 0.1])))',
+      expected: "0.659 0.242 0.099",
+      kmap: { stage: "S5 · softmax（:122 对应物）", where: "point_transformer_v2m2_base.py:122（sim = softmax(sim, dim=-1)）", what: "分数 → 和为 1 的权重分布，并放大差距", link: "减 max 防溢出 = 数值稳定的通用套路；权重混合 V 在 :127（s5q1）" },
+      title: "代码题 · 亲手算一次 softmax",
+      prompt: "不运行代码，心算或手算出 <code>print</code> 的大致输出（两位小数），再运行验证。（这就是 attention 里 :122 那行做的事）",
+      explain: `<p>exp(2)=7.39, exp(1)=2.72, exp(0.1)=1.11 → 和 ≈ 11.22 → <code>[0.659, 0.242, 0.099]</code>。两个观察：① 和为 1（归一化）；② 2.0 和 1.0 只差 1，权重却差 ~2.7 倍——softmax 用指数<b>放大差距</b>（纠正③）。实现里 <code>x - x.max()</code> 先减最大值：指数易溢出，减常数不改变 softmax 结果——数值稳定的通用技巧，生产代码里到处是。</p>`
+    },
+    {
+      id: "s5q5", type: "mc",
+      kmap: { stage: "S5 · 深度换广度", where: "config enc_channels=(96,192,384,512) + grid_sizes 四级", what: "每级 token 数 ÷16、通道 ×2；深度换感受野", link: "mipmap/LOD 金字塔同构（s2 剪枝视角）；第 4 级准全局 attention（s9q5）" },
+      title: "16^L：深度换广度",
+      prompt: "PTv2 编码器 4 级下采样，每级 token 数大约 ÷16、通道 ×2。这样设计的核心收益是什么？",
+      options: [
+        "让梯度更容易流动",
+        "省显存存 checkpoint",
+        "token 数指数级下降，高层在几百个 token 上做\"准全局\" attention——用级数（深度）换感受野（广度），成本可控",
+        "让 19 类的 logits 更平滑"
+      ],
+      correct: 2,
+      explain: `<p>格子边长逐级 ×2.5 → 3D 格子数逐级 ÷15.6（约 16）：12万 → ~8000 → ~500 → ~30 的量级。第 4 级只剩几百个 token，它们之间互相 attention 就是<b>准全局</b>——大范围上下文不贵了。深（级数 L）换广（感受野 ∝ 16^L），与 CNN 感受野翻倍、mipmap 逐级粗化同构。解码器再逐级上采样回来融合（U-Net）。</p>`
+    },
+    {
+      id: "s5q6", type: "tf", answer: false,
+      kmap: { stage: "S5 · 剪枝 vs 缓存", where: "概念层（GridSample / kNN / memoization 对比）", what: "下采样是有损剪枝，不是无损缓存", link: "DFS+memoization 是另一个话题（图算法）；LOD/BVH/SSAO 同属剪枝家族（s2 实验三）" },
+      title: "GridSample 是一种缓存吗？",
+      prompt: "判断：「GridSample 每格只留一个代表点，是把重复信息\"缓存\"起来以后复用——类似算法课的 memoization，所以是无损压缩。」",
+      explain: `<p>错。GridSample 是<b>剪枝</b>：每格扔掉 count-1 个点，信息真丢了、不可恢复（哪格扔了哪些点都不知道）。memoization/缓存是<b>无损</b>的——存全量结果的索引，之后任何查询都能精确还原。区分的实际意义：剪枝换来了计算量下降但有信息代价，所以测试侧要设计 TTA/铺回（s9 test 链）来弥补。图形学同构全是剪枝家族：LOD 简化、BVH 剔除、SSAO 降采样。</p>`
+    }
+  ]
+},
+{
+  id: "s6", name: "S6 · forward 六积木", desc: "<b>Step 4 补充B</b>：forward 设计的六个通用积木与其数学。读论文 = 认积木，设计网络 = 组积木。",
+  lesson: {
+    title: "📖 讲解 · forward 六积木 + 论文阅读观",
+    html: `
+<h4>知识点总结 · 创造力分布表（先立世界观）</h4>
+<table>
+<tr><th>环节</th><th>你的创造力</th><th>原因</th></tr>
+<tr><td>forward（网络结构）</td><td>★★★★★</td><td>积木怎么组装是开放设计——论文的创新几乎全在这</td></tr>
+<tr><td>loss 设计</td><td>★★★★</td><td>可换损失/加权/辅助损失</td></tr>
+<tr><td>config 超参</td><td>★★★</td><td>在固定结构上调参</td></tr>
+<tr><td>backward</td><td><b>0</b></td><td>自动微分引擎全包（第 4 章）</td></tr>
+</table>
+<h4>六块积木（以 PTv2 Block.forward 为例，point_transformer_v2m2_base.py:132 起约 15 行）</h4>
+<pre class="code">def forward(self, point):
+    identity = point.feats                      # ① 残差的"存档点"
+    point, agg = self.attn(point)               # ⑥ attention：动态加权邻居信息
+    point.feats = torch.cat([identity, agg], dim=1)   # 拼接新旧特征
+    point.feats = act(norm(linear(point.feats)))      # ②③④ MLP + 归一化 + 激活
+    point.feats = identity_proj + drop_path(...)      # ①残差 + ⑤DropPath
+    return point</pre>
+<table>
+<tr><th>积木</th><th>它解决什么</th><th>关键数学 / 直觉</th></tr>
+<tr><td>① 残差 <code>out = x + F(x)</code></td><td>深层网络训不动（梯度消失）</td><td><code>∂out/∂x = 1 + ∂F/∂x</code>——梯度有一条<b>恒为 1 的高速公路</b>直达浅层；ResNet 2015 之前 20+ 层网络难训</td></tr>
+<tr><td>② MLP（Linear 堆叠）</td><td>提供非线性表达力</td><td>万能逼近定理：足够宽的一隐层可逼近任意连续函数；多层堆叠=组合出复杂映射</td></tr>
+<tr><td>③ 归一化（LayerNorm 等）</td><td>数值稳定（内部协变量漂移）</td><td>"稳压器"：把每层输入拉回标准分布，防激活漂移；图形学同构 = tone mapping（HDR→LDR 拉回可显示范围）</td></tr>
+<tr><td>④ 激活（ReLU）</td><td>没它多层退化成一层</td><td>纯线性堆叠数学上塌缩成一个矩阵；ReLU 截断负半轴引入非线性。sigmoid 导数最大 0.25，10 层连乘 0.25¹⁰≈百万分之一 → 梯度消失；ReLU 正半轴导数恒 1</td></tr>
+<tr><td>⑤ DropPath（随机深度）</td><td>过拟合 / 正则化</td><td>训练时整条支路按概率 p 跳过（样本各自不同）→ 每个样本走不同子网 = 隐式 ensemble；推理全开。config 里 drop_path_rate=0.3 从浅到深线性加深</td></tr>
+<tr><td>⑥ attention（动态权重）</td><td>让"混合邻居信息的方式"依赖输入本身</td><td>conv 的权重训练完固定（静态滤波器）；attention 权重 = softmax(QKᵀ) 是输入的函数（动态路由）——表达力质变</td></tr>
+</table>
+<h4>论文阅读观 · 论文 = 积木新组装</h4>
+<p>PTv2 一句话说清：把 PTv1 的朴素 attention 换成<b>分组向量 attention + 网格池化 + 精确位置编码</b>的三件套组装——没有一个组件是全新发明，组合方式是新的。读论文的动作因此变成：<b>认积木（这用了残差/归一化/attention…）→ 找新积木（真新东西通常只有 0~2 个）→ 抄组装图（整体架构图）</b>。后续逆向拆解练习：PTv2 vs sparse_unet vs PTv3 三篇的积木组装对照表。</p>
+<div class="note">设计 forward 的隐藏约束 = 替 backward 铺路：设计时脑中要过一遍"梯度能不能流到这"——残差给梯度开高速路、ReLU 防连乘衰减、归一化防漂移；全串联的 sigmoid 深网是反面教材（0.25^L 梯度消失）。"会设计 forward + 懂梯度往哪流" = 算法工程师的完整底层要求。</div>
+<div class="exam"><h5>🎯 下面 5 道题考什么</h5>
+s6q1 考残差的梯度数学 / s6q2 考纯线性的塌缩 / s6q3 考 DropPath 训练/推理差异 / s6q4 考归一化的稳压器直觉 / s6q5 考 conv 静态 vs attention 动态</div>`
+  },
+  questions: [
+    {
+      id: "s6q1", type: "mc",
+      kmap: { stage: "S6 · 积木①残差", where: "Block.forward 里的 identity + 分支（v2m2_base.py:132 起）", what: "∂(x+F)/∂x = 1 + ∂F/∂x 的梯度高速路", link: "手搓残差对比实验（20 层有无残差）在第 3 周；梯度消失与 ReLU（s6q2）" },
+      title: "残差为什么能让深网训得动",
+      prompt: "<code>out = x + F(x)</code>（残差连接）。它让反向传播受益的数学原因是？",
+      options: [
+        "减少了参数量，梯度自然稳定",
+        "∂out/∂x = 1 + ∂F/∂x——存在恒为 1 的分量，梯度可以不经 F 直达浅层，连乘不再指数衰减",
+        "残差让 F 的输出归一化到 0~1",
+        "它把 loss 变小了"
+      ],
+      correct: 1,
+      explain: `<p>没有残差：梯度逐层是 ∏∂F/∂x，20 层连乘哪怕每层 0.9 也只剩 0.12（每层 0.5 就是百万分之一）——<b>梯度消失</b>，浅层收不到更新。有残差：∂out/∂x = 1 + ∂F/∂x，那个 <b>1</b> 是"梯度高速公路"，再深的网络浅层也保底收到 1 倍梯度。ResNet 2015 年靠它打开深层网络时代。</p>`
+    },
+    {
+      id: "s6q2", type: "mc",
+      kmap: { stage: "S6 · 积木②④ MLP 与激活", where: "Block.forward 的 act(norm(linear(...))) 链", what: "线性堆叠塌缩 + sigmoid 梯度消失两个经典结论", link: "ReLU vs sigmoid 数学（s6q2 题解）；MLP 万能逼近（s4q5 的 token 内变换）" },
+      title: "去掉激活函数会怎样",
+      prompt: "把网络里所有激活函数（ReLU）去掉，只留 Linear 层堆叠，会发生什么？",
+      options: [
+        "训练变慢但效果不变",
+        "网络表达力不变，只是参数变多",
+        "任意多层线性堆叠数学上等价于一层线性变换（W3·W2·W1 = W'）——网络退化成一个线性模型",
+        "梯度爆炸"
+      ],
+      correct: 2,
+      explain: `<p>线性函数套线性函数还是线性：<code>W₃(W₂(W₁x)) = (W₃W₂W₁)x = W'x</code>——100 层 Linear = 1 层 Linear，表达力没有任何提升。激活函数的唯一职责就是<b>打断线性塌缩</b>（引入非线性）。顺带 sigmoid 的教训：导数最大 0.25，10 层连乘 0.25¹⁰≈10⁻⁶——这也是为什么现代网络默认 ReLU 系（正半轴导数恒 1）。</p>`
+    },
+    {
+      id: "s6q3", type: "tf", answer: true,
+      kmap: { stage: "S6 · 积木⑤ DropPath", where: "Block.forward 的 drop_path(...) + config drop_path_rate=0.3", what: "训练随机跳支路 = 隐式 ensemble；推理全开", link: "model.eval() 控制 DropPath/Dropout 开关（B5 题，step5 练习场）" },
+      title: "DropPath 的训练/推理差异",
+      prompt: "判断：「DropPath（随机深度）在训练时按概率把某些样本的残差支路整个跳过，不同样本走的是不同\"子网络\"——相当于隐式模型集成（ensemble）；推理时关闭，所有支路全开。」",
+      explain: `<p>对。训练时每个样本独立掷骰子决定走不走支路（p 随深度从 0 线性升到 drop_path_rate=0.3，深层更常被跳）；每样本见过不同子网 → 等效 ensemble 的正则化效果。推理必须全开（<code>model.eval()</code>），否则输出随机化、指标抖动。这与 Dropout 同一家族，只是\"丢弃\"的粒度是整条支路。</p>`
+    },
+    {
+      id: "s6q4", type: "qa",
+      kmap: { stage: "S6 · 积木③归一化", where: "Block.forward 的 norm(...)（LayerNorm）", what: "把每层输入拉回稳定分布", link: "tone mapping 同构（图形学直觉）；归一化对比实验在第 3 周手搓清单" },
+      title: "归一化层的稳压器直觉",
+      prompt: "用自己的话讲：①没有归一化层时，深层网络的数值会发生什么问题；②归一化层怎么解决；③图形学里哪个技术同构。",
+      points: [
+        "层层变换会让激活的分布漂移（越来越偏/越来越大）——内部协变量漂移",
+        "漂移放大后梯度也跟着失衡，训练不稳定/发散",
+        "归一化把每层输入重新拉回均值 0 方差 1（再学一个缩放平移还原表达力）",
+        "像稳压器/tone mapping：不管输入动态范围多大，输出稳定在可用区间",
+        "位置：通常放在激活/变换之前（norm→act 或 pre-norm 结构）"
+      ],
+      ref: `<p>每层都在对上一层的输出做变换，分布会逐层漂移（均值/方差越走越偏）→ 梯度跟着失衡。<b>归一化 = 稳压器</b>：把每层输入拉回 μ=0、σ=1 的标准分布（再配可学的 scale/shift 保留表达力），训练立刻稳定。图形学同构：<b>tone mapping</b>——HDR 渲染值动态范围巨大，tone map 到可显示区间；不管场景多亮多暗，输出永远稳定可用。</p>`
+    },
+    {
+      id: "s6q5", type: "mc",
+      kmap: { stage: "S6 · 积木⑥ attention", where: "GroupedVectorAttention（v2m2_base.py:48）", what: "conv 权重训练后固定；attention 权重是输入的函数", link: "softmax(QKᵀ)（s5q4）；\"开会/消化\"分工（s4q5）" },
+      title: "conv 的静态 vs attention 的动态",
+      prompt: "卷积核和 attention 的本质区别，最准确的说法是？",
+      options: [
+        "conv 处理图像，attention 处理文本，领域不同",
+        "conv 的权重训练完就固定（静态滤波器）；attention 的混合权重 softmax(QKᵀ) 由输入实时算出（动态路由）",
+        "conv 是加法，attention 是乘法",
+        "conv 更快，所以 attention 没有优势"
+      ],
+      correct: 1,
+      explain: `<p>conv：训练结束时卷积核的数值已定死，推理时对任何输入都用同一套滤波器——<b>权重静态</b>。attention：每个输入都要现算 QKᵀ→softmax 得到混合权重——<b>权重是输入的函数</b>，同样的\"邻居\"在不同内容下混合方式不同。这是表达力的质变，代价就是要付计算（这也是 attention 贵、conv 便宜的原因）。</p>`
+    }
+  ]
+},
+{
+  id: "s7", name: "S7 · 执行机制", desc: "<b>Step 4 补充A/C</b>：Python 指挥 CUDA 演奏、自动微分三步、CUDA kernel ↔ shader 对照。回答\"代码到底在哪一层执行\"。",
+  lesson: {
+    title: "📖 讲解 · 执行机制：Python 指挥 / CUDA 演奏 / shader 同源",
+    html: `
+<h4>知识点总结 1 · 分层执行（一张图记住）</h4>
+<pre class="code">Python 层（你写的）     train.py / model 代码     —— 指挥：慢、逐条解释执行
+   ↓ 调用
+ATen/C++ 层（框架）     torch 的算子库            —— 翻译官：把 Python 命令翻译成批量算子
+   ↓ dispatch
+CUDA kernel 层（GPU）   pointops / cuDNN kernel   —— 演奏：千线程并行，快千倍</pre>
+<p><b>四个身份一个对象</b>：<code>nn.Linear</code> 既是 Python 类（你 import 的）、也是 nn.Module 链上的节点、也是 ATen 算子的调用者、最终也是 GPU kernel 的调度者——只是站在不同层看。Python 解释执行比 C++ 慢 <b>100~1000 倍</b>，且有 GIL 不能并行——所以一切重活必须下沉到 C++/CUDA。</p>
+<p>图形学同构：<b>JS draw call（指挥）vs GPU shader（演奏）</b>——JS 慢所以只发指令，真正逐顶点/逐像素的活在 GPU 上并行。WebGL 标准管线 vs 自定义 shader ≈ PyTorch 标准算子 vs 自定义 CUDA kernel。</p>
+<h4>知识点总结 2 · 自动微分三步（backward 引擎的工作原理）</h4>
+<p>① <b>记账</b>：前向时把每个运算记进计算图（tensor 上挂 grad_fn）；② <b>反向走图</b>：loss 出发逆拓扑序遍历；③ <b>链式连乘</b>：每节点只算本地导数，乘上传来的上游梯度继续传。验证实验（可跑）：<code>x = torch.tensor(2., requires_grad=True); y = x**3; y.backward(); x.grad</code> → <b>12</b>（3x²@x=2）。第二个实验：<code>np.dot</code> 批量 vs Python for 循环计时 → 差 100~1000 倍，亲眼看"指挥层不能干重活"。</p>
+<h4>知识点总结 3 · CUDA kernel ↔ compute shader 对照（你最大的优势区）</h4>
+<p>动机完全相同：<b>宿主语言（Python/JS）慢千倍 → 把逐元素重活写成并行 kernel 下沉到 GPU</b>。看真身 <code>libs/pointops/src/knn_query/knn_query_cuda_kernel.cu:60</code>：</p>
+<pre class="code">/* CUDA（knn_query_cuda_kernel.cu:60） */        /* compute shader 同构 */
+__global__ void knn_query_cuda_kernel(...)       // #version 450 的 main()
+int pt_idx = blockIdx.x * blockDim.x + threadIdx.x;   // gl_GlobalInvocationID.x —— 同一个数！
+if (pt_idx >= b*n) return;                        // 越界卫兵
+// 每线程负责一个查询点：局部 top-16 小顶堆
+// （:15-42 reheap / heap_sort——堆上浮与排序）
+// kernel&lt;&lt;&lt;blocks, threads&gt;&gt;&gt; 启动               // glDispatchCompute(x,y,z)</pre>
+<table>
+<tr><th>CUDA 概念</th><th>WebGPU/WebGL 同构</th><th>共同动机</th></tr>
+<tr><td><code>__global__</code> 入口函数</td><td>compute shader 的 <code>main()</code></td><td>声明"这是 GPU 上跑的并行函数"</td></tr>
+<tr><td>device 指针 / <code>__global__</code> 内存</td><td>SSBO / storage buffer</td><td>GPU 可读写的大块显存</td></tr>
+<tr><td><code>kernel&lt;&lt;&lt;grid, block&gt;&gt;&gt;</code></td><td><code>glDispatchCompute / dispatchWorkgroups</code></td><td>声明线程规模并启动</td></tr>
+<tr><td>threadIdx / blockIdx</td><td>gl_GlobalInvocationID</td><td>"我是第几号线程"（SIMT）</td></tr>
+</table>
+<p><b>libs/pointops = shader 库</b>：knn_query（每线程小顶堆）、ball_query、grouping、interpolation、subtraction、aggregation——点云专用的"算子 shader 库"。N×M 距离矩阵 12万×12万≈57GB 的账（同 s5q2），kernel 的解法 = 每线程一个小顶堆流式维护 top-16，显存 O(N×K)。</p>
+<h4>知识点总结 4 · 逃逸舱口（PyTorch 的三级火箭）</h4>
+<p>① <b>95% 情况</b>：标准算子组合够用（torch 全家桶）；② <b>不够快</b>：Triton / torch.compile（类 shader 化的高级语言写 kernel）；③ <b>终极</b>：裸 CUDA（pointops 路线）。你的岗位（工程落地）对应：<b>看懂 kernel + 会改参数/逻辑</b>，不是从零写。</p>
+<div class="exam"><h5>🎯 下面 5 道题考什么</h5>
+s7q1 考分层执行与"为什么 Python 不能干重活" / s7q2 考自动微分验证（代码题）/ s7q3 考 threadIdx↔gl_GlobalInvocationID 同构 / s7q4 考 N×M 大账与 top-16 堆解法 / s7q5 考自己的岗位边界（懂什么不懂什么）</div>`
+  },
+  questions: [
+    {
+      id: "s7q1", type: "mc",
+      kmap: { stage: "S7 · 分层执行", where: "engines/train.py（Python）→ torch 算子（ATen）→ CUDA kernel", what: "Python 慢 100~1000x + GIL → 重活必须下沉", link: "JS draw call vs shader 同构；numpy \"Python 命令 + C 执行\"（API 速查）" },
+      title: "为什么 Python 不能亲自干重活",
+      prompt: "PyTorch 训练代码是 Python 写的，但真正的数值计算都下沉到 C++/CUDA。核心原因是：",
+      options: [
+        "Python 语法不支持数学运算",
+        "Python 解释执行慢 100~1000 倍且有 GIL 不能并行——所以 Python 只当\"指挥\"，重活下沉给 GPU 并行\"演奏\"",
+        "GPU 显存只能被 C++ 访问",
+        "Python 不支持浮点数"
+      ],
+      correct: 1,
+      explain: `<p>Python 是解释执行 + GIL 单线程锁——干重活比 C++/CUDA 慢两三个数量级。所以分层：Python 层写控制流（指挥），ATen/C++ 层翻译成批量算子，CUDA 层千线程并行（演奏）。你熟悉得不能再熟悉：<b>JS 发 draw call 很薄，逐顶点逐像素的活在 shader 里并行</b>——同一架构思想。</p>`
+    },
+    {
+      id: "s7q2", type: "code", kind: "predict",
+      code: 'import torch\nx = torch.tensor(2.0, requires_grad=True)\ny = x ** 3\ny.backward()\nprint(x.grad)',
+      expected: "12",
+      kmap: { stage: "S7 · 自动微分验证", where: "torch autograd（engine 内部）", what: "y=x³ 的导数 3x² 在 x=2 处 = 12", link: "反向传播三步（s4q3）；链式法则（s6q1 残差）" },
+      title: "代码题 · 亲手验证自动微分",
+      prompt: "不运行代码，算出 <code>x.grad</code> 打印的值，再运行验证（需要 CPU 版 torch；这是对自动微分引擎最直接的\"信任建立\"实验）。",
+      explain: `<p>y = x³ → dy/dx = 3x²，x=2 → 3×4 = <b>12</b>。backward() 没有任何手写导数——引擎记账（x³ 这步记进图）→ 反向走图 → 链式法则算出 12。你唯一要做的是 requires_grad=True（声明"这个量要记账"）。把 y 换成更深的复合函数，答案自动正确——这就是"写 forward 等于定义 backward"。</p>`
+    },
+    {
+      id: "s7q3", type: "mc",
+      kmap: { stage: "S7 · CUDA↔shader", where: "libs/pointops/src/knn_query/knn_query_cuda_kernel.cu:60", what: "blockIdx×blockDim+threadIdx = gl_GlobalInvocationID", link: "kernel<<<>>> = glDispatchCompute（同构表）；SIMT = compute shader 执行模型" },
+      title: "kernel 的\"线程身份证\"同构",
+      prompt: "<code>knn_query_cuda_kernel.cu:60</code> 的 <code>int pt_idx = blockIdx.x * blockDim.x + threadIdx.x;</code> 在 compute shader 里最对应的表达式是：",
+      options: [
+        "gl_Position",
+        "gl_GlobalInvocationID.x",
+        "uniform mat4 u_mvp",
+        "texture(sampler, uv)"
+      ],
+      correct: 1,
+      explain: `<p>两者都是回答同一句话：\"<b>我是第几号线程，因此我处理第几个数据</b>\"。CUDA 的 grid/block 两级展开线性化成全局 id；WebGPU 的 workgroup/local id 一样线性化成 gl_GlobalInvocationID。认出这个同构，kernel 源码就不再可怕——它是你写过的 compute shader 换了个方言。</p>`
+    },
+    {
+      id: "s7q4", type: "qa",
+      kmap: { stage: "S7 · pointops 的解法", where: "knn_query_cuda_kernel.cu:15-42（堆）与 :60（线程映射）", what: "N×M 大账 → 每线程小顶堆流式 top-K", link: "57GB 的账（s5q2）；shader 库清单（ball_query/grouping/…）" },
+      title: "kNN kernel 如何避免 57GB 距离矩阵",
+      prompt: "朴素 kNN 要算 N×M 距离矩阵（12万×12万 ≈ 57GB）。阅读 <code>knn_query_cuda_kernel.cu</code> 的思路后，说清 kernel 用什么结构、怎么把显存压下来的（说出\"每线程负责谁\"+\"用什么数据结构\"+\"复杂度量级\"三个要点）。",
+      points: [
+        "每线程（threadIdx 映射）负责一个查询点 pt_idx",
+        "流式扫过所有候选点：算一个距离就喂进一个长度 16 的小顶堆（reheap 上浮维护）",
+        "扫完后堆里就是 top-16 最近邻（heap_sort 收尾）",
+        "显存从 O(N×M) 降到 O(N×K)，时间 O(N×M) 但单线程流式、无大矩阵实体",
+        "这正是\"没有 N×M 张量实体\"的关键——矩阵只在寄存器/局部变量里瞬时存在"
+      ],
+      ref: `<p>要点：<b>①线程映射</b>——:60 行把 blockIdx/threadIdx 折算成 pt_idx，每线程管一个查询点；<b>②数据结构</b>——长度 K=16 的<b>小顶堆</b>（:15-42 的 reheap/heap_sort）：新距离比堆顶小就替换+上浮，流式喂完全部候选，堆里自动留下最近 16 个；<b>③量级</b>——距离矩阵从不实体存在（不占显存，只在寄存器里瞬时算），显存 O(N×K) 而非 O(N×M)。这就是\"每线程一个小顶堆\"的 shader 思维——你写 compute shader 做 top-K 过滤是同一个套路。</p>`
+    },
+    {
+      id: "s7q5", type: "qa",
+      kmap: { stage: "S7 · 认知边界", where: "step4_补充讲解_执行机制.md 的分界表", what: "懂梯度流/工程现象，不背 kernel 内部/数学推导", link: "逃逸舱口三级（standard→Triton→裸 CUDA）；岗位角色表（工程落地=看懂+会改）" },
+      title: "画清自己的认知边界",
+      prompt: "对\"backward 的执行机制\"这件事，列出：①你必须<b>懂</b>到什么程度的三件事（能说清即可）；②你<b>不需要</b>深入的两件事（知道存在即可）。",
+      points: [
+        "懂①：梯度往哪流（计算图反向、链式法则），会不会断（detach/不可导处）",
+        "懂②：梯度消失/爆炸这类现象的成因与积木级对策（残差/ReLU/归一化）",
+        "懂③：backward 报错时（形状不匹配/梯度为 None）能定位到前向哪一步",
+        "不需要①：autograd 引擎 C++ 内部如何建图/求值（知道\"记账+反向走图\"就够）",
+        "不需要②：手推每个算子的导数公式 / kernel 内部的数值优化细节"
+      ],
+      ref: `<p>类比定位：你懂\"<b>水文学</b>\"（水往哪流、哪里会堵、堵了怎么办）而不需要懂\"<b>水管公式</b>\"（每节管道的流体力学方程）——后者是框架作者的事。这跟你的老本行一致：写 shader 不需要懂 GPU 驱动的指令调度。岗位边界（工程落地）= 看懂 kernel + 会改参数与逻辑；真要写新 kernel 时有逃逸舱口三级（标准算子 → Triton/torch.compile → 裸 CUDA）托底。</p>`
+    }
+  ]
+},
+{
+  id: "s8", name: "S8 · 工程骨架", desc: "<b>Step 4 主实验</b>：Registry / config / Trainer / 钩子四件套——迷你框架亲手造过一遍，再看仓库真身对照。",
+  lesson: {
+    title: "📖 讲解 · 四件套：Registry → config → Trainer → 钩子",
+    html: `
+<h4>知识点总结 · 为什么需要工程骨架</h4>
+<p>算法代码（forward/loss）只回答"模型怎么算"；工程骨架回答"<b>模型怎么被装配、训练怎么被驱动</b>"。四件套各自解决一个问题：</p>
+<table>
+<tr><th>件</th><th>解决的问题</th><th>一句话机制</th></tr>
+<tr><td>Registry 注册表</td><td>"字符串 → 类"的解耦：config 写名字，不必 import 具体类</td><td>dict 存名→类；<code>cls(**cfg)</code> 反射构造</td></tr>
+<tr><td>config 配置</td><td>实验的全部可变项集中一处、可继承复用</td><td>addict.Dict（属性访问）+ _base_ 继承只写差异</td></tr>
+<tr><td>Trainer 训练器</td><td>把循环与"每一步该干嘛"分离</td><td>lifecycle 调用 getattr(self, name)() 分发</td></tr>
+<tr><td>Hook 钩子</td><td>训练流程的"插件插槽"：计时/写日志/评估/存档全挂进来</td><td>钩子对象实现 8 个生命周期方法，Trainer 按时机调用</td></tr>
+</table>
+<h4>仓库代码例子 1 · 迷你版（step4_mini_framework.py，纯 Python 零依赖，已跑通）</h4>
+<pre class="code">class Registry:
+    def __init__(self, name):
+        self._name = name
+        self._module_dict = dict()          # 名字 → 类
+    def register_module(self, name=None, force=False):
+        def _register(cls):
+            self._module_dict[name or cls.__name__] = cls
+            return cls                       # 装饰器原样返回类
+        return _register
+
+MODELS = Registry("model")
+
+def build(cfg, registry, default_args=None):
+    cfg = cfg.copy()
+    args = cfg.copy()
+    if default_args: args.update(default_args)
+    cls = registry.get(args.pop("type"))    # 按字符串查表
+    return cls(**args)                       # 剩余字段全变构造参数</pre>
+<h4>仓库代码例子 2 · 真身对照（pointcept/ 里的同款）</h4>
+<table>
+<tr><th>位置</th><th>迷你版没有的（真身多出的部分）</th></tr>
+<tr><td><code>pointcept/engines/registry.py</code></td><td>build_from_cfg 的 <b>default_args 合并</b>（train/eval/test 模式注入）；异常包装（报错时告诉你 cfg 哪里错了）；<b>parent/children 作用域链</b>（跨包查类，如 <code>type="mmdet.ResNet"</code>）；infer_scope 自动推断包名</td></tr>
+<tr><td><code>pointcept/engines/train.py:69-90</code></td><td>真主循环与迷你版结构一致（before_train→epoch{before_epoch→steps→after_epoch}→after_train）；train_step 多三样<b>工程加固</b>：梯度累积、AMP 混合精度（scaler.scale/unscale_/update）、clip_grad 梯度裁剪——概念骨架没变</td></tr>
+<tr><td><code>configs/_base_/default_runtime.py</code></td><td>hooks 列表 7 个钩子（CheckpointLoader→ModelHook→IterationTimer→InformationWriter→SemSegEvaluator→CheckpointSaver→PreciseEvaluator），字符串→HOOKS Registry 查表装配</td></tr>
+</table>
+<h4>仓库代码例子 3 · 钩子的挂接细节</h4>
+<pre class="code"># train.py:66
+self.trainer = weakref.proxy(self)      # 弱引用代理：钩子持 trainer 弱引用，防循环引用内存泄漏
+
+# Trainer._trigger（迷你版同款逻辑）
+def _trigger(self, name):
+    for hook in self.hooks:
+        getattr(hook, name, lambda *a: None)(self)   # 按字符串分发到钩子的同名方法</pre>
+<p>生命周期全景：<code>before_train → [每个 epoch: before_epoch → 每个 step: train_step… → after_epoch] → after_train</code>。钩子实现这 8 个方法中的任意子集即可（继承 HookBase）。</p>
+<h4>两个 config 小知识</h4>
+<p>① <b>_base_ 继承</b>：semantic_kitti config 第 1 行 <code>_base_ = ["../_base_/default_runtime.py"]</code>——子 config 只写差异字段，其余从基类继承（Vue props 默认值覆盖的既视感）。② <b>mix_prob=0.8</b>：不是训练超参，是 <b>collate 阶段的 batch 混合概率</b>（datasets/utils.py:208 point_collate_fn）——以 0.8 概率把 batch 内偶数/奇数位置的样本<b>物理拼接</b>成一个大数据集（点云靠 offset 分 batch，拼接成本几乎为零）——点云特色增强。</p>
+<div class="note">模型类的 forward 三分支：DefaultSegmentor.forward（models/default.py:21）按 self.training 分——training→只回 loss；eval+有标签→loss+logits；test→只回 logits。训练循环里取 <code>output_dict["loss"]</code>。DefaultSegmentorV2 多一层：backbone 吐 Point 结构、外面套 seg_head Linear 收敛到类别数。</div>
+<div class="exam"><h5>🎯 下面 6 道题考什么</h5>
+s8q1 考 Registry 的字符串→类机制 / s8q2 考钩子分发的 getattr（代码题）/ s8q3 考生命周期顺序 / s8q4 考真身比迷你版多什么 / s8q5 考 _base_ 继承与 mix_prob / s8q6 考 weakref.proxy 的用途</div>`
+  },
+  questions: [
+    {
+      id: "s8q1", type: "mc",
+      kmap: { stage: "S8 · Registry", where: "pointcept/engines/registry.py + 迷你版 step4_mini_framework.py", what: "字符串查表 → cls(**cfg) 反射构造", link: "config 的 type 字段是入口（s9q1）；default_args/作用域链是真身增强" },
+      title: "Registry 解决什么问题",
+      prompt: "config 里写 <code>dict(type=\"GridSample\", grid_size=0.05)</code>，框架就能造出 GridSample 实例。Registry 的机制是？",
+      options: [
+        "编译期宏替换，type 字段被预处理器展开",
+        "全局 dict 存「名字 → 类」；build 时按 type 字符串查表取出类，再把其余字段作为关键字参数 cls(**cfg) 构造实例",
+        "Python 自动 import 全部文件匹配类名",
+        "用 JSON schema 校验后实例化"
+      ],
+      correct: 1,
+      explain: `<p>三步：<b>注册</b>（装饰器把类塞进 dict）→ <b>查表</b>（cfg["type"] 取类）→ <b>反射构造</b>（cfg 其余字段 <code>cls(**cfg)</code>）。价值 = <b>config 与实现解耦</b>：写 config 的人不需要 import 任何类，换模型/数据集只改字符串。前端同构：Vue 全局组件注册 + 动态 <code>&lt;component :is&gt;</code>。</p>`
+    },
+    {
+      id: "s8q2", type: "code", kind: "predict",
+      code: 'class Hook:\n    def after_epoch(self, t): print("H")\n\nclass Trainer:\n    def __init__(self):\n        self.hooks = [Hook()]\n    def _trigger(self, name):\n        for h in self.hooks:\n            getattr(h, name, lambda *a: None)(self)\n\nt = Trainer()\nt._trigger("after_epoch")\nt._trigger("before_epoch")\nprint("done")',
+      expected: "H done",
+      kmap: { stage: "S8 · 钩子分发", where: "train.py 的 _trigger 逻辑（getattr 按字符串分发）", what: "getattr(h, name, 默认) = 钩子方法不存在就跳过", link: "Python 语言点表（API 速查 §四）：getattr = obj[\"name\"] ?? null" },
+      title: "代码题 · getattr 分发",
+      prompt: "不运行代码，写出全部输出（两行），再运行验证。（这就是 Trainer 调钩子的真身机制）",
+      explain: `<p>第一行 <code>_trigger("after_epoch")</code>：Hook 有 after_epoch → 打印 <code>H</code>。第二行 <code>_trigger("before_epoch")</code>：Hook 没有 before_epoch → <code>getattr(h, "before_epoch", lambda…)</code> 取到<b>默认 lambda</b>，静默跳过。最后打印 <code>done</code>。所以输出两行：<code>H</code>、<code>done</code>。getattr 的第三参数 = JS 的 <code>?? null</code> 兜底——钩子只需实现自己关心的生命周期方法，其余自动跳过。</p>`
+    },
+    {
+      id: "s8q3", type: "mc",
+      kmap: { stage: "S8 · 生命周期", where: "engines/train.py:69-90（真主循环）", what: "before_train → epoch{before_epoch→steps→after_epoch} → after_train", link: "7 个内置钩子各挂在不同时机（default_runtime.py）；每 epoch 评估+存档（s9q6）" },
+      title: "Trainer 生命周期顺序",
+      prompt: "Trainer 的生命周期调用顺序正确的是：",
+      options: [
+        "before_epoch → before_train → 每个 step → after_epoch → after_train",
+        "before_train → [每个 epoch: before_epoch → 若干 train_step → after_epoch] → after_train",
+        "train_step → before_train → after_epoch → before_epoch",
+        "before_train → 所有 step → after_epoch（epoch 级钩子只在最后调一次）"
+      ],
+      correct: 1,
+      explain: `<p>外层 train 级（before_train / after_train 各一次），中间 epoch 级（每 epoch 各一次），内层 step 级（每个 train_step）。迷你版与真身结构完全一致——迷你框架的价值就是把这个骨架亲手摸过一遍。7 个内置钩子（CheckpointLoader/PreciseEvaluator 等）就是挂在这棵时机树上的。</p>`
+    },
+    {
+      id: "s8q4", type: "qa",
+      kmap: { stage: "S8 · 迷你→真身", where: "registry.py / train.py / default_runtime.py 三处", what: "概念骨架一致，真身多工程加固", link: "train_step 三加固（梯度累积/AMP/clip_grad）；SemSegEvaluator 钩子的每 epoch 评估" },
+      title: "迷你框架 vs 仓库真身",
+      prompt: "对照你亲手跑过的 <code>step4_mini_framework.py</code> 和仓库真身，回答：①三处对照点各在哪里、迷你版缺什么真身有的增强？②train_step 真身比迷你版多哪三样？",
+      points: [
+        "registry.py：真身有 default_args 合并、异常包装、parent/children 作用域链（跨包查类）、infer_scope",
+        "train.py:69-90：主循环骨架一致（before_train→epoch→steps→after_train），逻辑没变",
+        "default_runtime.py：hooks 列表 7 个钩子按字符串经 HOOKS Registry 装配",
+        "train_step 三加固：梯度累积（zero_grad 只在组首步、loss÷累积步数）、AMP 混合精度（scaler）、clip_grad 裁剪",
+        "结论句：概念骨架没变，多的全是工程加固"
+      ],
+      ref: `<p><b>三处对照</b>：①<code>registry.py</code>——迷你版 dict+反射，真身加 default_args/异常包装/作用域链（<code>type="mmdet.ResNet"</code> 跨包查）；②<code>train.py:69-90</code>——骨架一致；③<code>default_runtime.py</code>——7 钩子字符串→HOOKS Registry。<b>三加固</b>：梯度累积（小显存等效大 batch）、AMP 混合精度（scaler.scale/unscale_/update，FP16 提速省显存）、clip_grad（防梯度爆炸）。学习意义：骨架已在手，新看到的代码都是\"骨架 + 局部加固\"，不再有未知感。</p>`
+    },
+    {
+      id: "s8q5", type: "tf", answer: false,
+      kmap: { stage: "S8 · config 细节", where: "config 第 1 行 _base_ + datasets/utils.py:208（point_collate_fn）", what: "_base_ 继承只写差异；mix_prob 是 collate 阶段的物理拼接", link: "Collect 生成 offset（s3q2）；点云 batch 靠 offset 不靠 reshape" },
+      title: "_base_ 继承与 mix_prob 的真身",
+      prompt: "判断：「mix_prob=0.8 是训练时以 0.8 概率随机丢弃样本的正则化，写在 model 块里由 Trainer 读取。」",
+      explain: `<p>错。mix_prob 在 <b>data 块</b>、作用于 <b>collate 阶段</b>（datasets/utils.py:208 point_collate_fn）：以 0.8 概率把 batch 内偶数/奇数位置的样本<b>物理拼接</b>成更大的点集（instance id 平移、offset 重算）。为什么可行：点云没有固定 N 能 reshape，batch 本来就靠 offset 切分——拼接成本几乎为零。这是点云特色增强，图像做不了（图像必须保持 H×W 网格）。</p>`
+    },
+    {
+      id: "s8q6", type: "mc",
+      kmap: { stage: "S8 · 钩子挂接", where: "train.py:66（self.trainer = weakref.proxy(self)）", what: "弱引用代理打破循环引用", link: "Python 语言点表 weakref 条目（API 速查 §四）；钩子继承 HookBase" },
+      title: "weakref.proxy(self) 的用途",
+      prompt: "<code>train.py:66</code> 把 <code>weakref.proxy(self)</code> 传给钩子，而不是直接传 <code>self</code>。为什么？",
+      options: [
+        "让钩子访问 trainer 更快",
+        "防止循环引用：钩子持有 trainer 的强引用、trainer 又持有钩子列表 → GC 无法回收；weakref 不增加引用计数，打破环",
+        "线程安全需要",
+        "只是调试用，无实际作用"
+      ],
+      correct: 1,
+      explain: `<p>钩子长期活在 Trainer 的 hooks 列表里，若每个钩子再持有 Trainer 强引用 → <b>循环引用</b>；Python 的 GC 能处理部分环，但配合 <code>__del__</code>/外部资源时延迟释放甚至泄漏。weakref 引用计数不增加——打破环，trainer 生命周期照常。JS 同构：<code>WeakRef</code>；再往前你更熟的是 DOM 事件监听器导致节点泄漏的同类问题。proxy 还让钩子代码写起来与真对象无差别。</p>`
+    }
+  ]
+},
+{
+  id: "s9", name: "S9 · Config 全景", desc: "<b>Step 5</b>：semantic_kitti config 四大块（data/model/criteria/misc）逐块拆解。34 题深刷见 step5_practice.html，本章是精选串联版。",
+  lesson: {
+    title: "📖 讲解 · semantic_kitti config 四大块",
+    html: `
+<h4>知识点总结 · config 的四大块 = 训练的全部可变项</h4>
+<pre class="code">_base_ = ["../_base_/default_runtime.py"]   # 继承：只写差异（s8）
+data = dict(...transform 链...)               # 块① 数据管道（s3 已学）
+model = dict(type="DefaultSegmentorV2", ...)  # 块② 模型结构
+criteria = dict(...)                          # 块③ 损失
+epoch = 50, batch_size = 8, ...               # 块④ misc 杂项</pre>
+<h4>块① 数据管道（train 链 config:99-123 / test 链 :158 起）</h4>
+<p><b>训练链</b>（顺序即数据流）：RandomRotate(±180°, p=0.5) → RandomScale([0.9,1.1]) → RandomFlip(p=0.5, 两轴各自抛硬币) → RandomJitter(σ=0.005, clip=0.02) → <b>GridSample(0.05, train 模式, return_grid_coord)</b> → PointClip(±35.2) → SphereCrop(80000, random) → SphereCrop(120000, center) → ToTensor → Collect(feat_keys=["coord","strength"])。</p>
+<p><b>测试链</b>（与训练链两个关键差异）：① <b>PointClip 在最前</b>（先裁范围再增强，训练侧 GridSample 在前）；② <b>GridSample 用 0.025 半格采样、mode="train" 但 return_inverse=True</b>——采出两套点（sparse 0.05 全局体素一套、scale 0.025 细网格一套），<b>inverse 记住"全量点 → 采样点"的映射</b>，预测后把结果铺回全量点云（evaluator.py:187 <code>pred = pred[inverse]</code>，一行花式索引完成 gather）。</p>
+<p><b>TTA 测试时增强</b>：aug_transform 4 组 RandomRotateTargetAngle([0, 1/2, 1, 3/2], p=1)——同一帧点云按 0°/90°/180°/270° 各推理一次再融合，多花 4 倍时间换稳定提升。</p>
+<h4>块② 模型（PT-v2m2 U-Net 骨架）</h4>
+<table>
+<tr><th>字段</th><th>值</th><th>读法</th></tr>
+<tr><td>in_channels</td><td>4</td><td>coord(3)+strength(1)，与 Collect.feat_keys 对齐（s3q2）</td></tr>
+<tr><td>patch_embed</td><td>48 / 6 / 8</td><td>初始嵌入通道 48、patch 6×6×6 格、8 邻域 attention</td></tr>
+<tr><td>enc_depths / enc_channels</td><td>(2,2,6,2) / (96,192,384,512)</td><td>4 级下采样：第 3 级最深（6 个 block），通道逐级 ×2</td></tr>
+<tr><td>dec_depths / dec_channels</td><td>(1,1,1,1) / (48,96,192,384)</td><td>4 级上采样镜像回来，逐级融合 skip 特征</td></tr>
+<tr><td>grid_sizes</td><td>(0.15, 0.375, 0.9375, 2.34375)</td><td>各级池化格边长——与 GridSample 的 0.05 不同，这是 U-Net 内部的池化（GridPool）</td></tr>
+<tr><td>drop_path_rate / unpool_backend</td><td>0.3 / "map"</td><td>DropPath 概率（s6q3）；上采样用 map 反查（快）而非插值</td></tr>
+</table>
+<h4>块③ 损失（双损失组合）</h4>
+<p><code>CE(loss_weight=1.0, class_weight=[...19 数组...])</code> + <code>LovaszLoss(mode="multiclass", loss_weight=2.0)</code>（lovasz.py:22 / builder.py:26）。<b>class_weight 处理类别不均衡</b>：vegetation 1.3212 最低（类大、样本多）……motorcyclist 10.1922 最高（类小、样本稀有）——稀有类权重大 10 倍，防止网络"只学会大路货"。<b>Lovasz 直接优化 IoU</b>（评测指标），与 CE 的逐点交叉熵互补：CE 管"每个点判对"，Lovasz 管"整块区域分割质量"。</p>
+<h4>块④ misc 与评估节奏</h4>
+<p><code>epoch=50, eval_epoch=50</code> 且 loop=1 → <b>每个 epoch 都评估+存档一次，共 50 次</b>（defaults.py:122 / evaluator.py:164 / misc.py:173 的链路；勘误：不是"只评估 1 次"）。<code>batch_size=8</code> 是全局总 batch（defaults.py:135，多卡会分摊）。<code>AdamW lr=0.002 wd=0.005 + OneCycleLR</code> 调度（先升后降）。<code>weight=["ce_loss", "lovasz_loss"]</code>——两损失加权求和进 backward。</p>
+<div class="note">一句话数据流（全程收官句）：<b>.bin 读出 [N,4] → 几何增强扰动 → GridSample 0.05 降采样 → token + 格坐标 → PTv2 四级 U-Net attention → 19 类 logits → CE(类权)+Lovasz 双损失 → backward → AdamW 下山 → 每 epoch 评估存档</b>。测试侧：0.025 半格采样 + inverse 铺回 + 4 角度 TTA。</div>
+<div class="exam"><h5>🎯 下面 6 道题考什么</h5>
+s9q1 考 config 四大块分工 / s9q2 考 train 与 test 链的两个关键差异 / s9q3 考 class_weight 的含义（代码题）/ s9q4 考 inverse 铺回（代码题）/ s9q5 考 U-Net 通道金字塔读法 / s9q6 考 50/50 评估节奏勘误</div>`
+  },
+  questions: [
+    {
+      id: "s9q1", type: "mc",
+      kmap: { stage: "S9 · config 全景", where: "configs/semantic_kitti/semseg-pt-v2m2-0-base.py", what: "四大块 = data/model/criteria/misc，全部经 Registry 装配", link: "_base_ 继承（s8q5 相关）；feat_keys→in_channels（s3q2）" },
+      title: "config 四大块的分工",
+      prompt: "semantic_kitti config 的四大块，与各自回答的问题对应正确的是：",
+      options: [
+        "data 管\"数据怎么变\"、model 管\"结构怎么算\"、criteria 管\"怎么判对错\"、misc 管\"训多久/多快/怎么评估存档\"",
+        "data 管模型结构、model 管数据、criteria 管优化器、misc 管损失",
+        "四块都是超参数，没有结构信息",
+        "data/criteria 是训练用的，model/misc 是测试用的"
+      ],
+      correct: 0,
+      explain: `<p>四大块各答一问：<b>data</b>——数据从文件到张量走什么管道（transform 链）；<b>model</b>——网络结构长什么样（PTv2 U-Net 各级参数）；<b>criteria</b>——预测和答案的差距怎么算（CE+Lovasz）；<b>misc</b>——训练节奏（epoch/batch/lr/评估存档）。config 里的 type 字符串全部经 Registry 查表装配（s8q1）——这就是"改实验 = 改 config"的底气。</p>`
+    },
+    {
+      id: "s9q2", type: "qa",
+      kmap: { stage: "S9 · train/test 双链", where: "config:99-123（train）与 :158 起（test）", what: "Clip 位置对调 + GridSample 采样策略不同（inverse 铺回）", link: "GridSample inverse（s2q6 的 return_inverse）；TTA 融合；evaluator.py:187 铺回" },
+      title: "train 链和 test 链的两个关键差异",
+      prompt: "对比训练 transform 链和测试 transform 链，说出至少两个关键差异及各自的动机。（提示：PointClip 位置、GridSample 的参数与返回值）",
+      points: [
+        "测试链 PointClip 在最前（:158）——先裁到 ±35.2 范围再做后续处理",
+        "训练链 GridSample(0.05) 在增强后、Clip 前；测试链 GridSample 用 0.025 且 return_inverse=True",
+        "测试侧 GridSample 产出 sparse+scale 两套点，inverse 记录全量点→采样点的映射",
+        "动机：测试要对全量点云给预测，采样后算完再用 pred[inverse] 铺回（evaluator.py:187）",
+        "训练侧每格随机代表点=增强；测试侧确定性采样+可复原铺回"
+      ],
+      ref: `<p><b>差异① Clip 位置</b>：训练链 GridSample 在前 PointClip 在后（:99-123）；测试链 <b>PointClip 排最前</b>（:158）——先裁掉远点再做采样，保证 TTA 各组处理范围一致。<b>差异② GridSample 参数</b>：测试链 <code>grid_size=0.025</code>（半格细化）且 <code>return_inverse=True</code>——采出稀疏 token 集算 attention，同时保留 inverse 映射；模型预测后 <code>pred = pred[inverse]</code> 一行把 12 万全量点的预测铺回来。训练随机 / 测试确定+可复原，两种模式一个类实现。</p>`
+    },
+    {
+      id: "s9q3", type: "code", kind: "predict",
+      code: 'import numpy as np\nweights = {"vegetation": 1.3212, "car": 3.5, "motorcyclist": 10.1922}\nprint(max(weights, key=weights.get))\nprint(round(min(weights.values()), 1))',
+      expected: "motorcyclist 1.3",
+      kmap: { stage: "S9 · criteria 的 class_weight", where: "config criteria 块（19 元素数组）+ loss/builder.py:26", what: "类大权重小、类稀权重大（vegetation 1.32 ↔ motorcyclist 10.19）", link: "CE 双损失组合（Lovasz weight=2.0）；类别不均衡 = 语义分割核心难题" },
+      title: "代码题 · class_weight 两个极端",
+      prompt: "config 的 CE class_weight 是 19 元素数组，其中 vegetation≈1.3212（最低）、motorcyclist≈10.1922（最高）、car≈3.5。不运行代码，写出两行 print 的输出，再运行验证。",
+      explain: `<p>第一行：<code>max(weights, key=weights.get)</code> 按<b>值</b>找最大键 → <code>motorcyclist</code>；第二行：最小值 1.3212 round 一位 → <code>1.3</code>。所以输出 <code>motorcyclist</code>、<code>1.3</code>。设计逻辑：vegetation（植被）像素多、好分 → 权重压到 1.3；motorcyclist（摩托车手）又小又稀有 → 权重抬到 10.2，让稀有类的损失在总 loss 里有话语权。这是类别不均衡的标准解法，配合 Lovasz（weight=2.0）直接优化 IoU。</p>`
+    },
+    {
+      id: "s9q4", type: "code", kind: "predict",
+      code: 'import numpy as np\npred = np.array([2, 7, 4])          # 每个采样点的预测类别\ninverse = np.array([0, 0, 1, 2, 1]) # 全量点 -> 采样点映射\nprint(pred[inverse])',
+      expected: "2 2 7 4 7",
+      kmap: { stage: "S9 · inverse 铺回", where: "evaluator.py:187（pred = pred[inverse]）", what: "花式索引 = gather：按下标表逐个取", link: "np.unique(return_inverse=True) 的产物（s2q6）；gather 是你 GPU 母语（API 速查 §一.5）" },
+      title: "代码题 · 一行铺回全量点云",
+      prompt: "测试时模型只在采样点上出预测，<code>pred</code> 是 3 个采样点的类别，<code>inverse</code> 是 5 个全量点的映射。不运行代码，写出 <code>pred[inverse]</code> 的输出，再运行验证。（evaluator.py:187 真身同款）",
+      explain: `<p>花式索引逐个取：<code>[pred[0], pred[0], pred[1], pred[2], pred[1]]</code> → <code>[2 2 7 4 7]</code>。这就是 <b>gather</b>：inverse 数组是\"全量点 → 我属于哪个采样点\"的下标表，一行完成 12 万点的铺回（WebGL index buffer 选顶点同构）。inverse 由 GridSample 的 <code>np.unique(..., return_inverse=True)</code> 顺手产出——采样时多要一个返回值，铺回时就有一张现成的映射表。</p>`
+    },
+    {
+      id: "s9q5", type: "mc",
+      kmap: { stage: "S9 · model 块", where: "config model 块（enc/dec_depths/channels、grid_sizes）", what: "4 级 U-Net：enc 通道逐级 ×2 加深、dec 镜像回来融合", link: "16^L 深度换广度（s5q5）；unpool_backend=map（上采样反查）" },
+      title: "U-Net 通道金字塔的读法",
+      prompt: "model 块里 <code>enc_channels=(96,192,384,512)</code>、<code>dec_channels=(48,96,192,384)</code>、<code>grid_sizes=(0.15,0.375,0.9375,2.34375)</code>。正确的读法是：",
+      options: [
+        "enc 逐级通道减半、格子变小，dec 相反",
+        "enc 4 级下采样：格子越来越大、token 越来越少、通道逐级加宽；dec 镜像上采样并逐级融合 skip 特征",
+        "通道数就是类别数，4 级共 512 类",
+        "grid_sizes 是 GridSample 的 grid_size 候选值，训练时随机选一个"
+      ],
+      correct: 1,
+      explain: `<p>编码器：格子边长逐级 ×2.5（0.15→2.34）→ token 数 ÷16 逐级、通道逐级加宽（96→512）——空间换语义（s5q5 的 16^L）。解码器镜像：通道逐级减回（384→48），每级与编码器的 skip 特征融合（U-Net 的\"桥\"），最后 seg_head 输出 19 类。grid_sizes 是 U-Net <b>内部 GridPool</b> 的各级格边长，与数据侧 GridSample 的 0.05 是两回事。</p>`
+    },
+    {
+      id: "s9q6", type: "tf", answer: false,
+      kmap: { stage: "S9 · misc 评估节奏", where: "defaults.py:122 + evaluator.py:164 + misc.py:173", what: "epoch=eval_epoch=50 → 每 epoch 评估存档一次", link: "SemSegEvaluator 钩子（s8q4 的 7 钩子）；batch_size=8 全局总 batch" },
+      title: "评估节奏勘误（50/50）",
+      prompt: "判断：「config 里 epoch=50、eval_epoch=50 的意思是：训练 50 个 epoch，训练全部结束后才评估并保存 1 次。」",
+      explain: `<p>错。eval_epoch=50 = <b>每 1 个 epoch 就评估+存档一次，共 50 次</b>（loop=1；defaults.py:122 取值链 + SemSegEvaluator 钩子挂在 after_epoch）。训练全程产出 50 个 checkpoint，随时可回看中间状态、取最优 epoch——实验迭代的基本盘。这是本项目修正过的两处勘误之一（另一处：RandomRotate 的 angle=[-1,1] 是 ±180° 不是 ±57°）。</p>`
+    }
+  ]
+},
+];
+
+/* ══════════════════════════════════════════════════════════════
+   状态管理（localStorage）
+   ══════════════════════════════════════════════════════════════ */
+const LS_KEY = "step_all_review_v1";
+let record = {};
+try { record = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch (e) { record = {}; }
+function save() { localStorage.setItem(LS_KEY, JSON.stringify(record)); }
+
+let activeGroup = "overview";
+window._openCards = new Set();
+window._mode = {};
+window._pick = {};
+
+const ALL_Q = GROUPS.flatMap(g => g.questions.map(q => ({...q, gid: g.id})));
+const QMAP = Object.fromEntries(ALL_Q.map(q => [q.id, q]));
+const TYPE_NAME = { mc: "单选", tf: "判断", qa: "问答", code: "代码" };
+
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+/* ── 输出比对：抽数字序列按容差比，退化为去空白字符串比 ── */
+function gradeOutput(user, expected) {
+  const nums = s => (String(s).match(/-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g) || []).map(Number);
+  const a = nums(user), b = nums(expected);
+  if (a.length === b.length && a.length > 0) {
+    return a.every((v, i) => Math.abs(v - b[i]) <= 1e-6 * Math.max(1, Math.abs(b[i])));
+  }
+  const norm = s => String(s).replace(/\s+/g, " ").trim().toLowerCase();
+  return norm(user) === norm(expected);
+}
+
+/* ── 顶栏统计 ── */
+function renderOverall() {
+  const total = ALL_Q.length;
+  const done = ALL_Q.filter(q => record[q.id]).length;
+  const seen = ALL_Q.filter(q => record[q.id] && record[q.id].mode === "seen").length;
+  const objQs = ALL_Q.filter(q => record[q.id] && record[q.id].mode === "done" && (record[q.id].kind === "mc" || record[q.id].kind === "tf" || record[q.id].kind === "code"));
+  const objOk = objQs.filter(q => record[q.id].correct).length;
+  const qaQs = ALL_Q.filter(q => record[q.id] && record[q.id].mode === "done" && record[q.id].kind === "qa" && record[q.id].points);
+  let qaTxt = "–";
+  if (qaQs.length) {
+    let hit = 0, all = 0;
+    qaQs.forEach(q => { hit += record[q.id].points.filter(Boolean).length; all += record[q.id].points.length; });
+    qaTxt = Math.round(hit / all * 100) + "% (" + qaQs.length + "题)";
+  }
+  document.getElementById("ov-total").textContent = total;
+  document.getElementById("ov-done").textContent = done;
+  document.getElementById("ov-seen").textContent = seen;
+  const objEl = document.getElementById("ov-obj");
+  objEl.textContent = objQs.length ? objOk + "/" + objQs.length : "–";
+  objEl.className = objQs.length ? (objOk === objQs.length ? "good" : "bad") : "";
+  document.getElementById("ov-qa").textContent = qaTxt;
+  document.getElementById("ov-bar").style.width = (done / total * 100) + "%";
+}
+
+/* ── Tabs ── */
+function renderTabs() {
+  const tabs = document.getElementById("tabs");
+  tabs.innerHTML = GROUPS.map(g => {
+    const done = g.questions.filter(q => record[q.id]).length;
+    const cnt = g.questions.length ? `<span class="cnt">${done}/${g.questions.length}</span>` : "";
+    return `<button class="${g.id===activeGroup?'active':''}" onclick="switchGroup('${g.id}')">${g.name}${cnt}</button>`;
+  }).join("");
+}
+
+/* ── 状态徽章 ── */
+function badgeOf(q) {
+  const r = record[q.id];
+  if (!r) return `<span class="badge todo">未开始</span>`;
+  if (r.mode === "seen") return `<span class="badge seen">已看答案</span>`;
+  if (r.kind === "qa") {
+    if (!r.points) return `<span class="badge todo">已作答待评分</span>`;
+    const hit = r.points.filter(Boolean).length;
+    return `<span class="badge ${hit === r.points.length ? 'ok' : 'seen'}">自测 ${hit}/${r.points.length}</span>`;
+  }
+  return r.correct ? `<span class="badge ok">✓ 答对</span>` : `<span class="badge bad">✗ 答错</span>`;
+}
+function cardClass(q) {
+  const r = record[q.id];
+  if (!r) return "";
+  if (r.mode === "done" && r.kind !== "qa") return r.correct ? ' done' : ' wrong';
+  if (r.mode === "done" && r.kind === "qa" && r.points && r.points.every(Boolean)) return ' done';
+  return "";
+}
+
+/* ── 章节讲解（先讲解、后习题） ── */
+function lessonBlock(g) {
+  const open = (window._lessonOpen || {})[g.id] ? " open" : "";
+  return `
+  <div class="lesson${open}" id="lesson-${g.id}">
+    <div class="lesson-head" onclick="toggleLesson('${g.id}')">
+      <span class="lt">${g.lesson.title}</span>
+      <span class="chev">▶</span>
+    </div>
+    <div class="lesson-body">${g.lesson.html}${chatBlock("lesson", g.id)}</div>
+  </div>`;
+}
+function toggleLesson(gid) {
+  if (!window._lessonOpen) window._lessonOpen = {};
+  window._lessonOpen[gid] = !window._lessonOpen[gid];
+  const el = document.getElementById("lesson-" + gid);
+  if (el) el.classList.toggle("open");
+}
+
+/* ── 题目卡片 ── */
+function renderContent() {
+  const g = GROUPS.find(x => x.id === activeGroup);
+  const el = document.getElementById("content");
+  if (g.id === "overview") { el.innerHTML = renderJourney(); return; }
+  let html = `<div class="group-intro">${g.desc}</div>`;
+  if (g.lesson) html += lessonBlock(g);
+  html += g.questions.map(q => {
+    const isOpen = (window._openCards || {}).has(q.id) ? " open" : "";
+    return `
+    <div class="card${cardClass(q)}${isOpen}" id="card-${q.id}">
+      <div class="card-head" onclick="toggleCard('${q.id}')">
+        <span class="qno">${q.id}</span>
+        <span class="tchip ${q.type}">${TYPE_NAME[q.type]}</span>
+        <span class="qtitle">${q.title}</span>
+        ${badgeOf(q)}
+        <span class="chev">▶</span>
+      </div>
+      <div class="card-body">
+        <div class="prompt">${q.prompt}</div>
+        ${q.code ? `<pre class="code">${esc(q.code)}</pre>` : ""}
+        <div class="mode-tabs">
+          <button class="${!(window._mode||{})[q.id]||(window._mode||{})[q.id]==='self'?'active':''}" onclick="setMode('${q.id}','self')">✍ 自己作答</button>
+          <button class="${(window._mode||{})[q.id]==='seen'?'active':''}" onclick="setMode('${q.id}','seen')">👀 直接看答案</button>
+        </div>
+        <div id="zone-${q.id}"></div>
+        ${chatBlock("q", q.id)}
+      </div>
+    </div>`;
+  }).join("");
+  el.innerHTML = html;
+  g.questions.forEach(q => renderZone(q));
+  // renderContent 重建了 DOM，把已展开的 💬 问答窗内容补回来（历史在 window._chat 里）
+  if (g.lesson && chatState("lesson:" + g.id).open) renderChatBody("lesson", g.id);
+  g.questions.forEach(q => { if (chatState("q:" + q.id).open) renderChatBody("q", q.id); });
+}
+
+function currentMode(qid) { return (window._mode||{})[qid] || "self"; }
+function setMode(qid, m) { window._mode[qid] = m; renderContent(); }
+function toggleCard(qid) {
+  const card = document.getElementById("card-" + qid);
+  if (card.classList.contains("open")) { card.classList.remove("open"); window._openCards.delete(qid); }
+  else { card.classList.add("open"); window._openCards.add(qid); }
+}
+
+/* ── 每题作答区（按题型分发） ── */
+function renderZone(q) {
+  const zone = document.getElementById("zone-" + q.id);
+  if (!zone) return;
+  const mode = currentMode(q.id);
+  if (mode === "seen") {
+    zone.innerHTML = `
+      ${refBlock(q)}
+      <div class="scoreline">
+        <button class="btn primary" onclick="markSeen('${q.id}')">✓ 记为已看（算完成）</button>
+        ${record[q.id] ? "" : `<span class="hint">看答案完成的题计入进度，但不计分</span>`}
+      </div>`;
+    return;
+  }
+  if (q.type === "mc") return renderMC(zone, q);
+  if (q.type === "tf") return renderTF(zone, q);
+  if (q.type === "code") return renderCode(zone, q);
+  return renderQA(zone, q);
+}
+
+/* ── 单选题 ── */
+function renderMC(zone, q) {
+  const r = record[q.id];
+  const submitted = r && r.mode === "done";
+  const picked = submitted ? r.choice : (window._pick[q.id] ?? null);
+  const opts = q.options.map((o, i) => {
+    let cls = "opt";
+    if (!submitted) cls += (picked === i ? " picked" : "");
+    else {
+      cls += " locked";
+      if (i === q.correct) cls += " right";
+      else if (i === r.choice) cls += " wrongpick";
+    }
+    return `<div class="${cls}" ${submitted ? "" : `onclick="pickMC('${q.id}',${i})"`}><span class="tag">${"ABCD"[i]}</span><span>${o}</span></div>`;
+  }).join("");
+  zone.innerHTML = `
+    <div class="opts">${opts}</div>
+    ${submitted ? verdictBlock(q, r) : `
+    <div class="scoreline">
+      <button class="btn primary" ${picked == null ? "disabled" : ""} onclick="submitMC('${q.id}')">提交答案</button>
+      ${picked == null ? `<span class="hint">先选一个选项</span>` : ""}
+    </div>`}`;
+}
+
+function pickMC(qid, i) { window._pick[qid] = i; renderZone(QMAP[qid]); }
+function submitMC(qid) {
+  const q = QMAP[qid];
+  const choice = window._pick[qid];
+  if (choice == null) return;
+  record[qid] = { mode: "done", kind: "mc", choice, correct: choice === q.correct, ts: Date.now() };
+  save(); refresh();
+  toastChoice(qid);
+}
+
+/* ── 判断题 ── */
+function renderTF(zone, q) {
+  const r = record[q.id];
+  const submitted = r && r.mode === "done";
+  const picked = submitted ? r.choice : (window._pick[q.id] ?? null);
+  const opts = [
+    { v: true,  label: "✓ 对" },
+    { v: false, label: "✗ 错" }
+  ].map((o, i) => {
+    let cls = "opt";
+    if (!submitted) cls += (picked === o.v ? " picked" : "");
+    else {
+      cls += " locked";
+      if (o.v === q.answer) cls += " right";
+      else if (o.v === r.choice) cls += " wrongpick";
+    }
+    return `<div class="${cls}" ${submitted ? "" : `onclick="pickTF('${q.id}',${o.v})"`}><span>${o.label}</span></div>`;
+  }).join("");
+  zone.innerHTML = `
+    <div class="tfbtns">${opts}</div>
+    ${submitted ? verdictBlock(q, r) : `
+    <div class="scoreline">
+      <button class="btn primary" ${picked === null ? "disabled" : ""} onclick="submitTF('${q.id}')">提交答案</button>
+      ${picked === null ? `<span class="hint">先选「对」或「错」</span>` : ""}
+    </div>`}`;
+}
+
+function pickTF(qid, v) { window._pick[qid] = v; renderZone(QMAP[qid]); }
+function submitTF(qid) {
+  const q = QMAP[qid];
+  const choice = window._pick[qid];
+  if (choice === null || choice === undefined) return;
+  record[qid] = { mode: "done", kind: "tf", choice, correct: choice === q.answer, ts: Date.now() };
+  save(); refresh();
+  toastChoice(qid);
+}
+
+/* ── 代码题 ── */
+function renderCode(zone, q) {
+  const r = record[q.id];
+  const submitted = r && r.mode === "done";
+  if (q.kind === "write") {
+    if (!submitted) {
+      zone.innerHTML = `
+        <div class="hint">① 本地跑代码（<code>python -X utf8 你的脚本.py</code> 或粘进交互式环境）；② 下面两个框分别贴<b>代码</b>和<b>运行输出</b>。</div>
+        <textarea class="answer mono tall" id="ta-${q.id}" placeholder="# 在这里贴你的代码…"></textarea>
+        <div class="hint" style="margin-top:10px">运行输出（自动判分的依据）：</div>
+        <textarea class="answer mono" id="out-${q.id}" style="min-height:60px" placeholder="例如：945"></textarea>
+        <div class="scoreline">
+          <button class="btn primary" onclick="submitCode('${q.id}')">提交比对 →</button>
+        </div>`;
+    } else {
+      zone.innerHTML = `
+        <div class="compare">
+          <div class="col"><h5>你的代码</h5><div class="txt">${esc(r.code || "（空）")}</div></div>
+          <div class="col"><h5>你的输出</h5><div class="txt">${esc(r.output || "（空）")}</div></div>
+        </div>
+        ${verdictBlock(q, r)}`;
+    }
+    return;
+  }
+  // predict
+  if (!submitted) {
+    zone.innerHTML = `
+      <div class="hint">你的预测输出（<b>先别运行</b>，想清楚再写；拿不准可以运行验证）：</div>
+      <textarea class="answer mono" id="out-${q.id}" style="min-height:60px" placeholder="例如：[1 2 3] 或 0.5"></textarea>
+      <div class="scoreline">
+        <button class="btn primary" onclick="submitCode('${q.id}')">提交比对 →</button>
+        <span class="hint">按数字序列比对，格式差异不影响判分</span>
+      </div>`;
+  } else {
+    zone.innerHTML = `
+      <div class="compare">
+        <div class="col"><h5>你的预测</h5><div class="txt">${esc(r.output || "（空）")}</div></div>
+        <div class="col"><h5>实际输出</h5><div class="txt">${esc(q.expected)}</div></div>
+      </div>
+      ${verdictBlock(q, r)}`;
+  }
+}
+
+function submitCode(qid) {
+  const q = QMAP[qid];
+  const out = document.getElementById("out-" + qid);
+  const ta = document.getElementById("ta-" + qid);
+  const output = out ? out.value.trim() : "";
+  if (!output) { toast("先填运行输出再提交"); return; }
+  record[qid] = {
+    mode: "done", kind: "code", output,
+    code: ta ? ta.value.trim() : "",
+    correct: gradeOutput(output, q.expected),
+    ts: Date.now()
+  };
+  save(); refresh();
+  toastChoice(qid);
+}
+
+/* ── 客观题结果横幅 ── */
+function verdictBlock(q, r) {
+  const pass = r.correct;
+  let head = "";
+  if (q.type === "mc") {
+    head = pass
+      ? `<b class="pass-t">✓ 答对</b> —— 选了 ${"ABCD"[r.choice]}，正确。`
+      : `<b class="fail-t">✗ 答错</b> —— 你选了 ${"ABCD"[r.choice]}，正确答案是 <b>${"ABCD"[q.correct]}</b>。`;
+  } else if (q.type === "tf") {
+    head = pass
+      ? `<b class="pass-t">✓ 答对</b> —— 正确，这句话是<b>${q.answer ? "对的" : "错的"}</b>。`
+      : `<b class="fail-t">✗ 答错</b> —— 这句话是<b>${q.answer ? "对的" : "错的"}</b>，你判成了${q.answer ? "错的" : "对的"}。`;
+  } else {
+    head = pass
+      ? `<b class="pass-t">✓ 输出正确</b>`
+      : `<b class="fail-t">✗ 输出不符</b> —— 实际输出：<code>${esc(q.expected)}</code>`;
+  }
+  return `
+    <div class="verdict ${pass ? "pass" : "fail"}">
+      <div>${head} <button class="btn" style="margin-left:8px" onclick="retry('${q.id}')">🔁 再试一次</button></div>
+      <div class="exp"><h4 style="color:var(--accent);font-size:13px;margin-bottom:6px">为什么</h4>${q.explain}</div>
+    </div>
+    ${kmapBlock(q)}`;
+}
+
+/* ── 问答题 ── */
+function renderQA(zone, q) {
+  const r = record[q.id] || {};
+  const submitted = r.mode === "done";
+  if (!submitted) {
+    zone.innerHTML = `
+      <textarea class="answer" id="ta-${q.id}" placeholder="用自己的话写，不追求术语精确，写出你的理解就行…"></textarea>
+      <div class="scoreline">
+        <button class="btn primary" onclick="submitSelf('${q.id}')">对照参考答案 →</button>
+        <span class="hint">先写完再对——先看答案=白做</span>
+      </div>`;
+  } else {
+    const hit = r.points ? r.points.filter(Boolean).length : null;
+    zone.innerHTML = `
+      ${refBlock(q)}
+      <div class="compare">
+        <div class="col"><h5>你的答案</h5><div class="txt">${esc(r.answer || "（空）")}</div></div>
+        <div class="col"><h5>自评：勾选你答到的要点</h5>
+          <div class="points">
+            ${q.points.map((p, i) => `
+              <label class="${r.points && r.points[i] ? 'hit' : 'miss'}">
+                <input type="checkbox" ${r.points && r.points[i] ? "checked" : ""} onchange="togglePoint('${q.id}',${i},this.checked)">
+                <span>${p}</span>
+              </label>`).join("")}
+          </div>
+        </div>
+      </div>
+      ${hit !== null ? `<div class="scoreline"><span class="score-big">${hit}/${q.points.length}</span><span class="hint">诚实勾选——错的地方才是下次学习的入口</span></div>` : `<div class="scoreline"><span class="hint">勾完上面的要点自动计分</span></div>`}`;
+  }
+}
+
+function refBlock(q) {
+  if (q.type === "qa") {
+    return `
+      <div class="ref">
+        <h4>参考答案</h4>
+        <div class="body">${q.ref}</div>
+        <div class="points">
+          <h4>核心要点（${q.points.length} 个）</h4>
+          ${q.points.map(p => `<div>· ${p}</div>`).join("")}
+        </div>
+      </div>
+      ${kmapBlock(q)}`;
+  }
+  return `
+    <div class="ref">
+      <h4>参考答案${q.type === "mc" ? `（${"ABCD"[q.correct]}）` : q.type === "tf" ? `（${q.answer ? "对" : "错"}）` : `（输出：${esc(q.expected)}）`}</h4>
+      <div class="body">${q.explain || q.ref || ""}</div>
+    </div>
+    ${kmapBlock(q)}`;
+}
+
+/* ── 动作 ── */
+function markSeen(qid) {
+  record[qid] = { mode: "seen", ts: Date.now() };
+  save(); refresh();
+  toast("已记为看完 ✓（切换到「自己作答」可补测）");
+}
+function retry(qid) {
+  delete record[qid];
+  delete window._pick[qid];
+  save(); refresh();
+}
+function submitSelf(qid) {
+  const q = QMAP[qid];
+  const ta = document.getElementById("ta-" + qid);
+  const ans = ta ? ta.value.trim() : "";
+  if (!ans) { toast("先写点东西再对答案 :)"); return; }
+  const prev = record[qid];
+  record[qid] = {
+    mode: "done", kind: "qa", answer: ans,
+    points: (prev && prev.points && prev.answer === ans) ? prev.points : q.points.map(() => false),
+    ts: Date.now()
+  };
+  save();
+  renderZone(q);
+  document.getElementById("zone-" + qid).scrollIntoView({ behavior: "smooth", block: "nearest" });
+  refresh();
+}
+function togglePoint(qid, i, val) {
+  const q = QMAP[qid];
+  record[qid].points[i] = val;
+  save();
+  const zone = document.getElementById("zone-" + qid);
+  const div = zone.querySelector(".compare");
+  if (div) {
+    const hit = record[qid].points.filter(Boolean).length;
+    div.querySelectorAll("label")[i].className = val ? "hit" : "miss";
+    const sl = zone.querySelector(".score-big");
+    if (sl) sl.textContent = hit + "/" + q.points.length;
+    else {
+      const line = zone.querySelector(".scoreline .hint");
+      if (line) line.outerHTML = `<span class="score-big">${hit}/${q.points.length}</span><span class="hint">诚实勾选——错的地方才是下次学习的入口</span>`;
+    }
+  }
+  renderOverall(); renderTabs();
+}
+
+/* ── 知识定位块 ── */
+function kmapBlock(q) {
+  const k = q.kmap;
+  if (!k) return "";
+  return `
+    <div class="kmap">
+      <h4>📍 这题的概念在学习路线里的位置</h4>
+      <div class="krow"><span class="k">环节</span><span>${k.stage}</span></div>
+      <div class="krow"><span class="k">代码位置</span><span><code>${k.where}</code></span></div>
+      <div class="krow"><span class="k">作用</span><span>${k.what}</span></div>
+      <div class="krow"><span class="k">关联</span><span>${k.link}</span></div>
+    </div>`;
+}
+
+/* ── 全程地图：9 站学习旅程，芯片 = 题，颜色 = 战绩 ── */
+const JOURNEY = [
+  { t: "① Step 0/1 · 点云初见与领域问题", f: "step1_touch_pointcloud.py", d: "LiDAR 极坐标几何 · [N,3] 无序无拓扑表示 · 语义分割 = 给每个点上「类别颜色」", g: "s1" },
+  { t: "② Step 2 · GridSample 体素化实验", f: "step2_gridsample.py → transform.py:840", d: "floor 量化 + 空间哈希 + 前缀和分组 + 每格随机代表点 · 三个实验：证伪 → 真相 → 真功夫", g: "s2" },
+  { t: "③ Step 2 补充A · 数据链路两层", f: "datasets/semantic_kitti.py + transform.py", d: "dataset 类 = 格式翻译官（→标准字典）· transform 管道 = 中间件（顺序即数据流）· Collect = 出口", g: "s3" },
+  { t: "④ Step 2 补充B · 网络与训练循环", f: "原理层 → engines/train.py:69-90", d: "NN = 权重 + 固定流程 · 反向传播 = 计算图链式法则 · 五步心跳（前向/损失/backward/step/zero_grad）", g: "s4" },
+  { t: "⑤ Step 2 补充C + Step 3 · Attention 落地", f: "point_transformer_v2m2_base.py:48-129", d: "QKV 四纠正 · N²=144 亿的动机 · 体素=token / 16-NN 邻域 / 相对位置编码 / 分组向量注意力", g: "s5" },
+  { t: "⑥ Step 4 · forward 六积木", f: "Block.forward（v2m2_base.py:132）", d: "残差 / MLP / 归一化 / 激活 / DropPath / 动态权重 · 论文=积木新组装 · 设计 forward=替 backward 铺路", g: "s6" },
+  { t: "⑦ Step 4 · 执行机制与 CUDA↔shader", f: "engines/train.py + libs/pointops/src/knn_query", d: "Python 指挥 CUDA 演奏 · 自动微分三步 · kernel↔compute shader 同源（SIMT）· 逃逸舱口三级", g: "s7" },
+  { t: "⑧ Step 4 · 工程骨架", f: "registry.py + train.py + default_runtime.py", d: "Registry / config / Trainer / 钩子四件套 · 迷你框架亲手造（loss 5.0→2.5）· 仓库三处对照", g: "s8" },
+  { t: "⑨ Step 5 · Config 全景", f: "configs/semantic_kitti/semseg-pt-v2m2-0-base.py", d: "transform 链 / model U-Net / criteria 双损失 / test 推理技巧 → 一句话数据流（34 题深刷见 step5_practice.html）", g: "s9" }
+];
+function chipCls(qid) {
+  const r = record[qid];
+  if (!r) return "";
+  if (r.mode === "seen") return " c-seen";
+  if (r.kind === "qa") return (r.points && r.points.filter(Boolean).length === r.points.length) ? " c-ok" : " c-bad";
+  return r.correct ? " c-ok" : " c-bad";
+}
+function chips(qs) {
+  return qs.map(id => `<span class="chip${chipCls(id)}" onclick="jumpTo('${id}')">${id}</span>`).join("");
+}
+function renderJourney() {
+  return `
+    <div class="group-intro">从 Step 0 到 Step 5 的完整学习旅程。<b>芯片 = 一道题，颜色 = 你的战绩</b>：
+      <span class="chip c-ok">绿=对</span><span class="chip c-bad">红=错/漏要点</span><span class="chip c-seen">黄=看过答案</span><span class="chip">灰=未做</span>。
+      点击芯片直达那道题。推荐顺序：<b>开一章 → 先展开 📖 讲解读完（知识点 + 仓库代码）→ 扫 🎯 考点预告 → 再做题</b>。全绿 = 第一轮复习毕业。</div>
+    <div class="flow">
+      <h3 class="sec">Step 0 → Step 5 · 九站全景</h3>
+      <div class="flowwrap">
+      ${JOURNEY.map((s, i) => {
+        const g = GROUPS.find(x => x.id === s.g);
+        return `
+        <div class="stage">
+          <div class="t">${s.t}<span class="f">${s.f}</span></div>
+          <div class="d">${s.d}</div>
+          <div>${chips(g.questions.map(q => q.id))}</div>
+        </div>
+        ${i < JOURNEY.length - 1 ? '<div class="arrow">↓</div>' : ""}`;
+      }).join("")}
+      </div>
+    </div>`;
+}
+function jumpTo(qid) {
+  const q = QMAP[qid];
+  if (!q) return;
+  if (activeGroup !== q.gid) { activeGroup = q.gid; window._openCards = new Set(); renderTabs(); }
+  window._openCards.add(qid);
+  renderContent();
+  const card = document.getElementById("card-" + qid);
+  if (card) {
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+    card.classList.add("flash");
+    setTimeout(() => card.classList.remove("flash"), 1800);
+  }
+}
+
+/* ── 导出 & 重置 ── */
+function exportRecord() {
+  const lines = ["# Pointcept 全程复习（Step 0→5）· 学习记录", "导出时间：" + new Date().toLocaleString(), ""];
+  GROUPS.forEach(g => {
+    if (!g.questions.length) return;
+    lines.push("## " + g.name);
+    g.questions.forEach(q => {
+      const r = record[q.id];
+      const tag = `[${q.id}|${TYPE_NAME[q.type]}]`;
+      if (!r) { lines.push(`- ${tag} ${q.title} —— ⬜ 未做`); return; }
+      if (r.mode === "seen") { lines.push(`- ${tag} ${q.title} —— 👀 看了答案`); return; }
+      if (r.kind === "mc") {
+        lines.push(`- ${tag} ${q.title} —— ${r.correct ? "✓ 答对" : "✗ 答错"}（选了 ${"ABCD"[r.choice]}，正确 ${"ABCD"[q.correct]}）`);
+      } else if (r.kind === "tf") {
+        lines.push(`- ${tag} ${q.title} —— ${r.correct ? "✓ 答对" : "✗ 答错"}（判了「${r.choice ? "对" : "错"}」，正确「${q.answer ? "对" : "错"}」）`);
+      } else if (r.kind === "code") {
+        lines.push(`- ${tag} ${q.title} —— ${r.correct ? "✓ 输出正确" : "✗ 输出不符"}（我的输出：${(r.output || "").replace(/\n/g, " ")}；标准：${q.expected}）`);
+        if (r.code) lines.push(`  - 我的代码：${r.code.replace(/\n/g, " ⏎ ")}`);
+      } else {
+        const hit = r.points ? r.points.filter(Boolean).length + "/" + r.points.length : "未自评";
+        lines.push(`- ${tag} ${q.title} —— ✍ 自测 ${hit}`);
+        lines.push(`  - 我的答案：${(r.answer || "").replace(/\n/g, " ")}`);
+        const missed = q.points.filter((p, i) => r.points && !r.points[i]);
+        if (missed.length) lines.push(`  - 未命中要点：${missed.join("；")}`);
+      }
+    });
+    lines.push("");
+  });
+  const txt = lines.join("\n");
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(txt).then(
+      () => toast("已复制到剪贴板，直接粘贴给 Claude 对答案 ✓"),
+      () => downloadTxt(txt)
+    );
+  } else downloadTxt(txt);
+}
+function downloadTxt(txt) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([txt], { type: "text/plain;charset=utf-8" }));
+  a.download = "全程复习_学习记录.md";
+  a.click();
+  toast("已下载 全程复习_学习记录.md");
+}
+function resetAll() {
+  if (!confirm("清空全部作答记录和进度？（不可恢复；不影响 step5_practice.html 的记录）")) return;
+  record = {}; save(); refresh();
+  toast("已重置");
+}
+
+/* ── 杂项 ── */
+function switchGroup(id) { activeGroup = id; window._openCards = new Set(); renderTabs(); renderContent(); }
+function refresh() { renderOverall(); renderTabs(); renderContent(); }
+function toastChoice(qid) {
+  const r = record[qid];
+  toast(r.correct ? "✓ 答对了" : "✗ 不对——看下面的「为什么」");
+}
+/* ══════════════════════════════════════════════════════════════
+   💬 问答窗口：讲解/题目下方 → POST /ask（review_server.py）→ claude CLI
+   没有问答服务时优雅降级：窗口显示启动命令，做题功能不受影响
+   ══════════════════════════════════════════════════════════════ */
+window._chat = {};          // { "lesson:s2": {open, msgs:[{role,text}]}, "q:s2q1": {...} }
+window._chatBusy = false;   // 同一时刻只允许一个请求在飞（CLI 一次答一个）
+
+function chatState(key) {
+  if (!window._chat[key]) window._chat[key] = { open: false, msgs: [] };
+  return window._chat[key];
+}
+
+/* 去掉 HTML 标签，把实体解码成纯文本给 claude 当上下文 */
+function htmlToText(html) {
+  const d = document.createElement("div");
+  d.innerHTML = String(html)
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|li|h\d|pre|table|tr)>/gi, "\n");
+  return (d.textContent || "").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+/* 每个问答窗口附带的页面上下文：让 claude 知道用户在看什么 */
+function chatContext(kind, id) {
+  if (kind === "lesson") {
+    const g = GROUPS.find(x => x.id === id);
+    if (!g || !g.lesson) return "";
+    return "用户正在看复习站第「" + g.name + "」章的讲解：《" + g.lesson.title + "》。讲解正文：\n" + htmlToText(g.lesson.html).slice(0, 6000);
+  }
+  const q = QMAP[id];
+  if (!q) return "";
+  const r = record[id];
+  const answered = r && r.mode === "done";
+  let ctx = "用户正在做复习站的题目 " + id + "（" + TYPE_NAME[q.type] + " · 第「" +
+    (GROUPS.find(x => x.id === q.gid) || {}).name + "」章）：" + q.title + "\n题面：" + htmlToText(q.prompt);
+  if (q.code) ctx += "\n题目代码：\n" + q.code;
+  if (q.options) ctx += "\n选项：" + q.options.map((o, i) => "ABCD"[i] + ". " + htmlToText(o)).join("  ");
+  if (q.kmap) ctx += "\n该题知识定位：" + q.kmap.stage + "，代码位置 " + q.kmap.where;
+  ctx += answered
+    ? "\n用户已提交过这道题（" + (r.correct ? "答对了" : r.kind === "qa" ? "问答自评" : "答错了") + "），可以放开讲答案与解析。解析原文：" + htmlToText(q.explain || q.ref || "").slice(0, 2500)
+    : "\n注意：用户还没作答这道题——先给提示和思路引导，不要直接说出最终答案；用户明确要答案时再给。";
+  return ctx;
+}
+
+/* 极简 markdown → HTML（esc 后补粗体/行内代码/代码块/列表），只求够用 */
+function mdLite(src) {
+  const escd = esc(src);
+  const blocks = [];
+  let s = escd.replace(/```(\w*)\n?([\s\S]*?)```/g, (m, lang, code) => {
+    blocks.push("<pre><code>" + code.replace(/\n$/, "") + "</code></pre>");
+    return "\x00BLOCK" + (blocks.length - 1) + "\x00";
+  });
+  s = s.replace(/^#{1,4}\s+(.+)$/gm, "<h4>$1</h4>")
+       .replace(/^[-*]\s+(.+)$/gm, "<li>$1</li>")
+       .replace(/(<li>[\s\S]*?<\/li>)(?!\s*<li>)/g, m => "<ul>" + m + "</ul>")
+       .replace(/`([^`\n]+)`/g, "<code>$1</code>")
+       .replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  const paras = s.split(/\n{2,}/).map(p => {
+    const t = p.trim();
+    if (!t) return "";
+    if (/^<h4|^<ul|^<pre/.test(t) || /^\x00BLOCK\d+\x00$/.test(t)) return t;
+    return "<p>" + t.replace(/\n/g, "<br>") + "</p>";
+  }).join("");
+  return paras.replace(/\x00BLOCK(\d+)\x00/g, (m, i) => blocks[+i]);
+}
+
+function chatMsgHtml(m) {
+  if (m.role === "user") return `<div class="cmsg user">${esc(m.text)}</div>`;
+  if (m.role === "err") return `<div class="cmsg err">⚠ ${esc(m.text)}</div>`;
+  return `<div class="cmsg bot"><div class="who">claude ·</div>${mdLite(m.text)}</div>`;
+}
+
+function chatBlock(kind, id) {
+  const key = kind + ":" + id;
+  const st = chatState(key);
+  const title = kind === "lesson" ? "💬 关于本章讲解提问" : "💬 关于这道题提问";
+  const sub = st.msgs.length ? st.msgs.length + " 条对话" : "问题会连同本题内容一起发给 Claude";
+  return `
+  <div class="chatbox${st.open ? " open" : ""}" id="chat-${kind}-${id}">
+    <div class="chatbox-head" onclick="toggleChat('${kind}','${id}')">
+      <span>${title}</span><span class="sub">${sub}</span><span class="chev">▶</span>
+    </div>
+    <div class="chatbox-body" id="chatbody-${kind}-${id}"></div>
+  </div>`;
+}
+
+function renderChatBody(kind, id) {
+  const body = document.getElementById("chatbody-" + kind + "-" + id);
+  if (!body) return;
+  const st = chatState(kind + ":" + id);
+  if (window._chatOk === false) {          // 探测确认不在：降级提示（探测没回来之前先乐观显示输入框）
+    body.innerHTML = `
+      <div class="cmsg err" style="margin-top:10px">问答服务未连接。想用 💬 提问窗口：在仓库目录跑
+        <code>python -X utf8 review_server.py</code>（替代原来的 <code>python -m http.server 8765</code>），
+        然后浏览器访问 <code>http://127.0.0.1:8765/step_all_review.html</code> 并 Ctrl+F5。直接双击打开本文件时问答不可用，做题不受影响。</div>`;
+    return;
+  }
+  const msgsHtml = st.msgs.length
+    ? `<div class="chat-msgs" id="chatmsgs-${kind}-${id}">${st.msgs.map(chatMsgHtml).join("")}</div>`
+    : `<div class="chat-empty-hint">直接用中文问，比如「这个概念用 WebGL 里的话怎么理解？」——回答会带着本章/本题的上下文，也可以让它读仓库代码核实。</div>
+       <div class="chat-msgs" id="chatmsgs-${kind}-${id}"></div>`;
+  body.innerHTML = `
+    ${msgsHtml}
+    <div class="chatbar">
+      <textarea id="chatin-${kind}-${id}" rows="2" placeholder="你的问题…（Enter 发送 / Shift+Enter 换行）"
+        onkeydown="chatKeydown(event,'${kind}','${id}')"></textarea>
+      <button class="send" id="chatsend-${kind}-${id}" onclick="sendChat('${kind}','${id}')">发送</button>
+    </div>`;
+  const box = body.querySelector(".chat-msgs");
+  if (box) box.scrollTop = box.scrollHeight;
+}
+
+function toggleChat(kind, id) {
+  const st = chatState(kind + ":" + id);
+  st.open = !st.open;
+  const el = document.getElementById("chat-" + kind + "-" + id);
+  if (el) el.classList.toggle("open", st.open);
+  if (st.open) {
+    renderChatBody(kind, id);
+    const ta = document.getElementById("chatin-" + kind + "-" + id);
+    if (ta && !st.msgs.length) ta.focus();
+  }
+}
+
+function chatKeydown(ev, kind, id) {
+  if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); sendChat(kind, id); }
+}
+
+function setChatBusy(kind, id, busy) {
+  window._chatBusy = busy;
+  const btn = document.getElementById("chatsend-" + kind + "-" + id);
+  if (btn) { btn.disabled = busy; btn.textContent = busy ? "思考中…" : "发送"; }
+  const ta = document.getElementById("chatin-" + kind + "-" + id);
+  if (ta) ta.disabled = busy;
+}
+
+async function sendChat(kind, id) {
+  const ta = document.getElementById("chatin-" + kind + "-" + id);
+  if (!ta || window._chatBusy) return;
+  const text = ta.value.trim();
+  if (!text) return;
+  const st = chatState(kind + ":" + id);
+  st.msgs.push({ role: "user", text });
+  ta.value = "";
+  setChatBusy(kind, id, true);
+  const msgsBox = document.getElementById("chatmsgs-" + kind + "-" + id);
+  const wait = document.createElement("div");
+  if (msgsBox) {
+    wait.className = "chat-wait";
+    wait.innerHTML = "claude 正在答<span class=\"dots\"></span>（它会带着本题上下文、必要时读仓库代码核实，一般几秒到几十秒）";
+    msgsBox.appendChild(wait);
+    msgsBox.scrollTop = msgsBox.scrollHeight;
+  }
+  try {
+    const res = await fetch("/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: text,
+        context: chatContext(kind, id),
+        history: st.msgs.slice(-8, -1).map(m => (m.role === "user" ? "问：" : "答：") + m.text).join("\n").slice(-4000)
+      })
+    });
+    const data = await res.json();
+    wait.remove();
+    if (data.ok) st.msgs.push({ role: "bot", text: data.answer });
+    else st.msgs.push({ role: "err", text: data.error || "未知错误" });
+  } catch (e) {
+    wait.remove();
+    st.msgs.push({ role: "err", text: "请求失败：" + e.message + "——问答服务挂了？看服务器窗口的报错" });
+  } finally {
+    setChatBusy(kind, id, false);
+    renderChatBody(kind, id);
+    const box2 = document.getElementById("chatmsgs-" + kind + "-" + id);
+    if (box2) box2.scrollTop = box2.scrollHeight;
+  }
+}
+
+/* 启动探测 /ask 在不在：在 → 开问答；不在 → 静默降级（控制台留一句） */
+(async function probeChat() {
+  try {
+    const res = await fetch("/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ probe: true })
+    });
+    const data = await res.json();
+    window._chatOk = !!data.ok;
+    if (!window._chatOk) console.warn("[chat] 问答服务在但不可用：", data.error);
+  } catch (e) {
+    window._chatOk = false;
+    console.warn("[chat] 问答服务未连接（双击打开或纯静态服务器）——💬 窗口显示降级提示，做题不受影响");
+  }
+})();
+
+refresh();
+</script>
+</body>
+</html>
